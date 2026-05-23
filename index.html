@@ -267,9 +267,62 @@
             padding: 15px;
             text-align: center;
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 1rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             margin-bottom: 15px;
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+        }
+
+        .score-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .score-number {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .score-number.green { color: var(--correct); }
+        .score-number.red { color: var(--wrong); }
+        .score-number.gray { color: #636e72; }
+
+        .score-label {
+            font-size: 0.75rem;
+            color: #636e72;
+            font-weight: 600;
+        }
+
+        .test-result {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-top: 8px solid var(--correct);
+            margin-bottom: 20px;
+        }
+
+        .test-result h2 { color: var(--primary); margin-bottom: 10px; }
+        .test-result .final-score { font-size: 2rem; font-weight: 800; margin: 10px 0; }
+        .test-result .final-score.good { color: var(--correct); }
+        .test-result .final-score.ok { color: #fdcb6e; }
+        .test-result .final-score.bad { color: var(--wrong); }
+        .test-result p { color: #636e72; margin-top: 10px; }
+
+        .restart-btn {
+            margin-top: 15px;
+            padding: 12px 30px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
         }
 
         .hidden { display: none !important; }
@@ -346,7 +399,18 @@
             </select>
         </div>
 
-        <div class="test-score" id="test-score">Punkte: 0 / 0 ✍️</div>
+        <div class="test-score" id="test-score">
+            <div class="score-item"><span class="score-number green" id="score-correct">0</span><span class="score-label">Richtig ✅</span></div>
+            <div class="score-item"><span class="score-number red" id="score-wrong">0</span><span class="score-label">Falsch ❌</span></div>
+            <div class="score-item"><span class="score-number gray" id="score-remaining">0</span><span class="score-label">Übrig 📝</span></div>
+        </div>
+
+        <div class="test-result hidden" id="test-result">
+            <h2>🎉 Test fertig!</h2>
+            <div class="final-score" id="final-score">0%</div>
+            <p id="final-message">Ergebnis wird berechnet...</p>
+            <button class="restart-btn" onclick="restartTest()">🔄 Nochmal versuchen</button>
+        </div>
 
         <div class="test-card">
             <div class="category-badge" id="test-cat" style="position:relative; top:0; margin-bottom:15px;">Kategorie</div>
@@ -597,6 +661,7 @@
         let testQuestions = [...allTestQuestions];
         let testIndex = 0;
         let testCorrect = 0;
+        let testWrong = 0;
         let testAnswered = 0;
 
         function updateTestQuestion() {
@@ -641,13 +706,48 @@
                 input.className = "test-input wrong";
                 feedback.innerHTML = "❌ Leider falsch! Richtig wäre: <b>" + correctAnswer + "</b>";
                 feedback.className = "test-feedback wrong";
+                testWrong++;
             }
             testAnswered++;
             updateTestScore();
+
+            // Show result if all answered
+            if (testAnswered === testQuestions.length) {
+                setTimeout(showTestResult, 1200);
+            }
         }
 
         function updateTestScore() {
-            document.getElementById('test-score').innerHTML = "Punkte: " + testCorrect + " / " + testAnswered + " ✍️";
+            document.getElementById('score-correct').innerText = testCorrect;
+            document.getElementById('score-wrong').innerText = testWrong;
+            document.getElementById('score-remaining').innerText = (testQuestions.length - testAnswered);
+        }
+
+        function showTestResult() {
+            document.getElementById('test-result').classList.remove('hidden');
+            const percent = Math.round((testCorrect / testQuestions.length) * 100);
+            const scoreEl = document.getElementById('final-score');
+            scoreEl.innerText = percent + "%";
+
+            if (percent >= 80) {
+                scoreEl.className = "final-score good";
+                document.getElementById('final-message').innerText = "🌟 Mega! Du bist super vorbereitet!";
+            } else if (percent >= 50) {
+                scoreEl.className = "final-score ok";
+                document.getElementById('final-message').innerText = "👍 Gut, aber übe die falschen nochmal!";
+            } else {
+                scoreEl.className = "final-score bad";
+                document.getElementById('final-message').innerText = "💪 Nicht aufgeben! Lerne nochmal mit den Karteikarten.";
+            }
+        }
+
+        function restartTest() {
+            testIndex = 0;
+            testCorrect = 0;
+            testWrong = 0;
+            testAnswered = 0;
+            document.getElementById('test-result').classList.add('hidden');
+            updateTestQuestion();
         }
 
         function nextTestQ() {
@@ -664,7 +764,9 @@
             else { testQuestions = allTestQuestions.filter(q => q.cat === selectedTopic); }
             testIndex = 0;
             testCorrect = 0;
+            testWrong = 0;
             testAnswered = 0;
+            document.getElementById('test-result').classList.add('hidden');
             updateTestQuestion();
         }
 
