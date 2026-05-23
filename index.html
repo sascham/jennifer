@@ -12,6 +12,8 @@
             --text: #2d3436;
             --card-front-border: #74b9ff;
             --card-back-border: #fd79a8;
+            --correct: #00b894;
+            --wrong: #e17055;
         }
 
         body {
@@ -29,6 +31,40 @@
         header { text-align: center; margin-bottom: 15px; }
         h1 { margin-bottom: 5px; color: var(--primary); font-size: 1.8rem; }
         header p { font-size: 1rem; color: #636e72; }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 550px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 3px solid var(--primary);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            background: white;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 0;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #f0edff;
+        }
 
         .select-container {
             margin-bottom: 20px;
@@ -48,6 +84,7 @@
             font-weight: 600;
         }
 
+        /* Flashcard styles */
         .card-container {
             width: 100%;
             max-width: 550px;
@@ -149,6 +186,94 @@
 
         .progress { font-weight: 700; font-size: 15px; min-width: 70px; text-align: center; color: var(--primary); }
         .score-bar { margin-top: 15px; width: 100%; max-width: 550px; text-align: center; font-size: 0.9rem; color: #636e72; }
+
+        /* Written Test Styles */
+        .test-section { display: none; width: 100%; max-width: 550px; }
+        .test-section.active { display: block; }
+        .flashcard-section { display: none; width: 100%; max-width: 550px; display: flex; flex-direction: column; align-items: center; }
+        .flashcard-section.active { display: flex; }
+
+        .test-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-top: 8px solid #fdcb6e;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .test-question {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .test-question .blank {
+            display: inline-block;
+            border-bottom: 3px solid var(--primary);
+            min-width: 120px;
+            margin: 0 4px;
+        }
+
+        .test-input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .test-input {
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 3px solid #dfe6e9;
+            border-radius: 10px;
+            outline: none;
+            width: 200px;
+            text-align: center;
+            font-weight: 600;
+            transition: border-color 0.3s;
+        }
+
+        .test-input:focus { border-color: var(--primary); }
+        .test-input.correct { border-color: var(--correct); background: #d4edda; }
+        .test-input.wrong { border-color: var(--wrong); background: #ffeaea; }
+
+        .test-check-btn {
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+        }
+
+        .test-feedback {
+            margin-top: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            min-height: 30px;
+        }
+
+        .test-feedback.correct { color: var(--correct); }
+        .test-feedback.wrong { color: var(--wrong); }
+
+        .test-score {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+        }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -157,46 +282,92 @@
         <p>Tippe auf die Karte, um die Antwort zu sehen! 👆</p>
     </header>
 
-    <div class="select-container">
-        <select id="topic-select" onchange="changeTopic()">
-            <option value="alle">🎯 Alle Themen gemischt</option>
-            <option value="Bewegungsapparat">🦴 1. Der Bewegungsapparat</option>
-            <option value="Nase">👃 2. Die Nase</option>
-            <option value="Zunge">👅 3. Die Zunge</option>
-            <option value="Gehirn">🧠 4. Das Gehirn</option>
-            <option value="Lunge">🫁 5. Die Lunge</option>
-            <option value="Ohr">👂 6. Das Ohr</option>
-            <option value="Abwehrsystem">🛡️ 7. Das Abwehrsystem</option>
-            <option value="Verdauung">🍏 8. Das Verdauungssystem</option>
-            <option value="Herz">❤️ 9. Das Herz</option>
-            <option value="Auge">👁️ 10. Das Auge</option>
-        </select>
+    <!-- Tab Navigation -->
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('flashcards')">📇 Karteikarten</button>
+        <button class="tab-btn" onclick="switchTab('test')">✍️ Schriftlicher Test</button>
     </div>
 
-    <div class="card-container" onclick="flipCard()">
-        <div class="card" id="flashcard">
-            <div class="card-face card-front">
-                <span class="category-badge" id="card-cat-front">Kategorie</span>
-                <div class="card-text" id="card-q">Frage lädt...</div>
-                <div class="hint">🔄 Klicken zum Umdrehen</div>
+    <!-- FLASHCARD SECTION -->
+    <div id="flashcard-section" class="flashcard-section active">
+        <div class="select-container">
+            <select id="topic-select" onchange="changeTopic()">
+                <option value="alle">🎯 Alle Themen gemischt</option>
+                <option value="Bewegungsapparat">🦴 1. Der Bewegungsapparat</option>
+                <option value="Nase">👃 2. Die Nase</option>
+                <option value="Zunge">👅 3. Die Zunge</option>
+                <option value="Gehirn">🧠 4. Das Gehirn</option>
+                <option value="Lunge">🫁 5. Die Lunge</option>
+                <option value="Ohr">👂 6. Das Ohr</option>
+                <option value="Abwehrsystem">🛡️ 7. Das Abwehrsystem</option>
+                <option value="Verdauung">🍏 8. Das Verdauungssystem</option>
+                <option value="Herz">❤️ 9. Das Herz</option>
+                <option value="Auge">👁️ 10. Das Auge</option>
+            </select>
+        </div>
+
+        <div class="card-container" onclick="flipCard()">
+            <div class="card" id="flashcard">
+                <div class="card-face card-front">
+                    <span class="category-badge" id="card-cat-front">Kategorie</span>
+                    <div class="card-text" id="card-q">Frage lädt...</div>
+                    <div class="hint">🔄 Klicken zum Umdrehen</div>
+                </div>
+                <div class="card-face card-back">
+                    <span class="category-badge" id="card-cat-back">Lösung</span>
+                    <div class="card-text" id="card-a">Antwort lädt...</div>
+                    <div class="hint">🔄 Klicken für nächste Frage</div>
+                </div>
             </div>
-            <div class="card-face card-back">
-                <span class="category-badge" id="card-cat-back">Lösung</span>
-                <div class="card-text" id="card-a">Antwort lädt...</div>
-                <div class="hint">🔄 Klicken für nächste Frage</div>
+        </div>
+
+        <div class="controls">
+            <button id="prev-btn" onclick="prevCard(event)">⬅️ Zurück</button>
+            <span class="progress" id="progress-text">0 / 0</span>
+            <button id="next-btn" onclick="nextCard(event)">Weiter ➡️</button>
+        </div>
+        <div class="score-bar">Viel Erfolg beim Lernen! 🌟</div>
+    </div>
+
+    <!-- WRITTEN TEST SECTION -->
+    <div id="test-section" class="test-section">
+        <div class="select-container">
+            <select id="test-topic-select" onchange="changeTestTopic()">
+                <option value="alle">🎯 Alle Themen gemischt</option>
+                <option value="Bewegungsapparat">🦴 1. Der Bewegungsapparat</option>
+                <option value="Nase">👃 2. Die Nase</option>
+                <option value="Zunge">👅 3. Die Zunge</option>
+                <option value="Gehirn">🧠 4. Das Gehirn</option>
+                <option value="Lunge">🫁 5. Die Lunge</option>
+                <option value="Ohr">👂 6. Das Ohr</option>
+                <option value="Abwehrsystem">🛡️ 7. Das Abwehrsystem</option>
+                <option value="Verdauung">🍏 8. Das Verdauungssystem</option>
+                <option value="Herz">❤️ 9. Das Herz</option>
+                <option value="Auge">👁️ 10. Das Auge</option>
+            </select>
+        </div>
+
+        <div class="test-score" id="test-score">Punkte: 0 / 0 ✍️</div>
+
+        <div class="test-card">
+            <div class="category-badge" id="test-cat" style="position:relative; top:0; margin-bottom:15px;">Kategorie</div>
+            <div class="test-question" id="test-question">Frage lädt...</div>
+            <div class="test-input-row">
+                <input type="text" class="test-input" id="test-answer" placeholder="Deine Antwort..." autocomplete="off" onkeydown="if(event.key==='Enter')checkTestAnswer()">
+                <button class="test-check-btn" onclick="checkTestAnswer()">Prüfen ✓</button>
             </div>
+            <div class="test-feedback" id="test-feedback"></div>
+        </div>
+
+        <div class="controls">
+            <button id="test-prev-btn" onclick="prevTestQ()">⬅️ Zurück</button>
+            <span class="progress" id="test-progress">0 / 0</span>
+            <button id="test-next-btn" onclick="nextTestQ()">Weiter ➡️</button>
         </div>
     </div>
 
-    <div class="controls">
-        <button id="prev-btn" onclick="prevCard(event)">⬅️ Zurück</button>
-        <span class="progress" id="progress-text">0 / 0</span>
-        <button id="next-btn" onclick="nextCard(event)">Weiter ➡️</button>
-    </div>
-
-    <div class="score-bar" id="score-bar">Viel Erfolg beim Lernen! 🌟</div>
-
     <script>
+        // ===== KARTEIKARTEN-DATEN =====
         const allCards = [
             // === BEWEGUNGSAPPARAT ===
             { cat: "Bewegungsapparat", q: "Erkläre kurz: Was versteht man unter dem Bewegungsapparat?", a: "Ein System aus Knochen, Muskeln und Gelenken, die zusammenarbeiten, damit wir uns bewegen können." },
@@ -214,7 +385,6 @@
             { cat: "Bewegungsapparat", q: "Zeige auf dem Bild: Wo sitzt der Femur?<br><img src='skelett.png'>", a: "Der <b>Femur</b> ist der lange Knochen im Oberschenkel!" },
             { cat: "Bewegungsapparat", q: "Finde die Tibia auf dem Bild!<br><img src='skelett.png'>", a: "Die <b>Tibia</b> ist das Schienbein – vorne am Unterschenkel!" },
             { cat: "Bewegungsapparat", q: "Wo sitzen die Rippen? Zeige es auf dem Bild!<br><img src='skelett.png'>", a: "Die <b>Rippen</b> bilden den Brustkorb – sie umschließen Herz und Lunge wie ein Käfig!" },
-
             // === DIE NASE ===
             { cat: "Nase", q: "Stimmt das? Nasenschleim hilft dabei, Bakterien abzuwehren.", a: "<b>Richtig! ✅</b> Der Schleim fängt Bakterien ein wie eine Klebefalle." },
             { cat: "Nase", q: "Stimmt das? In unserer Nase wachsen mehr als 100 Härchen.", a: "<b>Richtig! ✅</b> Sie filtern Schmutz und Keime aus der Luft." },
@@ -238,7 +408,6 @@
             { cat: "Zunge", q: "Kann unsere Zunge genau 5 verschiedene Geschmäcke unterscheiden?", a: "<b>Ja! ✅</b> Süß, salzig, sauer, bitter und umami." },
             { cat: "Zunge", q: "Stimmt das? Umami schmeckt man hinter dem bitteren Bereich auf der Zunge.", a: "<b>Nein! ❌</b> Umami liegt VOR bitter, nicht dahinter." },
             { cat: "Zunge", q: "Stimmt das? Ein weißer Zungenbelag entsteht durch Bakterien.", a: "<b>Nein! ❌</b> Er entsteht durch abgestorbene Zellen, Essensreste und Schleim." },
-
             // === DAS GEHIRN ===
             { cat: "Gehirn", q: "Welche 4 Teile hat das Gehirn? Schau aufs Bild!<br><img src='gehirn.png'>", a: "1. <b>Großhirn</b><br>2. <b>Zwischenhirn</b><br>3. <b>Kleinhirn</b><br>4. <b>Hirnstamm</b>" },
             { cat: "Gehirn", q: "Was für ein Organ ist das Gehirn – einfach oder komplex?", a: "Ein sehr <b>komplexes</b> Organ – es steuert alles in unserem Körper! 🧠" },
@@ -264,7 +433,6 @@
             { cat: "Lunge", q: "Was ist eine Pneumokoniose auf Deutsch?", a: "Eine <b>Staublunge</b> – entsteht durch zu viel eingeatmeten Staub." },
             { cat: "Lunge", q: "Beim Sport atmen wir anders. Welche Atmung nutzen wir dann?", a: "Die <b>Mundatmung</b> – weil wir mehr Luft brauchen! 🏃" },
             { cat: "Lunge", q: "Hat der Mensch einen oder zwei Lungenflügel?", a: "<b>Zwei!</b>" },
-
             // === DAS OHR ===
             { cat: "Ohr", q: "Wie heißt das Gleichgewichtsorgan im Ohr mit Fachbegriff?", a: "<b>Vestibularapparat</b> – er hilft uns, Balance zu halten! ⚖️" },
             { cat: "Ohr", q: "Ohrenschmalz gibt es in zwei Varianten. Welche?", a: "Es kann <b>trocken</b> oder <b>feucht</b> sein." },
@@ -290,7 +458,6 @@
             { cat: "Verdauung", q: "Ordne zu: Was ist Nr. 1, 2, 3 und 4?<br><img src='verdauung.png'>", a: "1: <b>Speiseröhre</b><br>2: <b>Magen</b><br>3: <b>Leber</b><br>4: <b>Gallenblase</b>" },
             { cat: "Verdauung", q: "Was liegt bei Nr. 5, 6 und 10?<br><img src='verdauung.png'>", a: "5: <b>Bauchspeicheldrüse</b><br>6: <b>Dünndarm</b><br>10: <b>Anus</b> (Ausgang)" },
             { cat: "Verdauung", q: "Was liegt bei Nr. 7, 8 und 9 im Verdauungssystem?", a: "7: <b>Dickdarm</b><br>8: <b>Krummdarm</b><br>9: <b>Rektum</b> (Enddarm)" },
-
             // === DAS HERZ ===
             { cat: "Herz", q: "Stimmt das? Unser Herz hat genau 3 Kammern.", a: "<b>Falsch! ❌</b> Es hat 4 Kammern (2 Vorhöfe + 2 Herzkammern)." },
             { cat: "Herz", q: "Stimmt das? Das Herz gehört zu den wichtigsten Organen überhaupt.", a: "<b>Richtig! ✅</b> Ohne Herz geht gar nichts! ❤️" },
@@ -310,20 +477,88 @@
             { cat: "Auge", q: "Stimmt das? Man kann nachts problemlos auf Bildschirme schauen, weil es den Augen egal ist.", a: "<b>Falsch! ❌</b> Bildschirme schaden den Augen – besonders nachts!" },
         ];
 
+        // ===== SCHRIFTLICHER TEST – Lückentexte (1 Wort, exakte Schreibweise!) =====
+        const allTestQuestions = [
+            // BEWEGUNGSAPPARAT
+            { cat: "Bewegungsapparat", q: "Der Oberschenkelknochen heißt auf Latein ___.", answer: "Femur" },
+            { cat: "Bewegungsapparat", q: "Das Schienbein heißt auf Latein ___.", answer: "Tibia" },
+            { cat: "Bewegungsapparat", q: "Der Knochen zwischen Wirbelsäule und Beinen heißt ___.", answer: "Becken" },
+            { cat: "Bewegungsapparat", q: "Der Unterarmknochen, der wie ein Fahrradteil heißt: ___.", answer: "Speiche" },
+            { cat: "Bewegungsapparat", q: "Sie besteht aus vielen Wirbeln und gibt uns Haltung: die ___.", answer: "Wirbelsäule" },
+            { cat: "Bewegungsapparat", q: "Der Knochenkäfig um Herz und Lunge heißt ___.", answer: "Brustkorb" },
+            { cat: "Bewegungsapparat", q: "Das gesamte Knochengerüst des Menschen nennt man ___.", answer: "Skelett" },
+
+            // NASE
+            { cat: "Nase", q: "Die ___ in der Nase fangen Bakterien und Schmutz ab.", answer: "Nasenhaare" },
+            { cat: "Nase", q: "Die ___ in der Nase produziert Schleim gegen Bakterien.", answer: "Schleimhaut" },
+            { cat: "Nase", q: "Wenn man sich an der Nase stößt, kann man ___ bekommen.", answer: "Nasenbluten" },
+
+            // ZUNGE
+            { cat: "Zunge", q: "Die Zungenoberfläche ist mit einer speziellen ___ bedeckt.", answer: "Schleimhaut" },
+            { cat: "Zunge", q: "Die Zunge ist unten am ___ befestigt.", answer: "Mundboden" },
+            { cat: "Zunge", q: "Die Zunge kann sich so gut bewegen, weil sie aus ___ besteht.", answer: "Muskeln" },
+            { cat: "Zunge", q: "Der fünfte Geschmack neben süß, salzig, sauer und bitter heißt ___.", answer: "Umami" },
+
+            // GEHIRN
+            { cat: "Gehirn", q: "Das Gehirn ist ein sehr ___ Organ.", answer: "komplexes" },
+            { cat: "Gehirn", q: "Der größte Teil des Gehirns heißt ___.", answer: "Großhirn" },
+            { cat: "Gehirn", q: "Der Teil unter dem Großhirn heißt ___.", answer: "Zwischenhirn" },
+            { cat: "Gehirn", q: "Der kleine Teil hinten am Gehirn heißt ___.", answer: "Kleinhirn" },
+            { cat: "Gehirn", q: "Der unterste Teil des Gehirns heißt ___.", answer: "Hirnstamm" },
+            { cat: "Gehirn", q: "Die Schlüsselregion für Emotionen ist das ___ System.", answer: "Limbische" },
+            { cat: "Gehirn", q: "Der ___ kontrolliert die Körpertemperatur.", answer: "Hypothalamus" },
+
+            // LUNGE
+            { cat: "Lunge", q: "Die Lunge bringt ___ in unseren Körper.", answer: "Sauerstoff" },
+            { cat: "Lunge", q: "Die Lunge besteht aus zwei ___.", answer: "Lungenflügeln" },
+            { cat: "Lunge", q: "Eine gesunde Lunge hat ungefähr 300 Millionen ___.", answer: "Lungenbläschen" },
+            { cat: "Lunge", q: "Pneumokoniose bedeutet auf Deutsch ___.", answer: "Staublunge" },
+            { cat: "Lunge", q: "Beim Sport hilft uns die ___, weil wir mehr Luft brauchen.", answer: "Mundatmung" },
+
+            // OHR
+            { cat: "Ohr", q: "Das Gleichgewichtsorgan im Ohr heißt ___.", answer: "Vestibularapparat" },
+            { cat: "Ohr", q: "Das spiralförmige Teil im Innenohr heißt ___.", answer: "Schnecke" },
+            { cat: "Ohr", q: "Der mittlere Bereich des Ohrs heißt ___.", answer: "Mittelohr" },
+            { cat: "Ohr", q: "Die ___ gleicht den Druck im Ohr aus.", answer: "Ohrtrompete" },
+
+            // ABWEHRSYSTEM
+            { cat: "Abwehrsystem", q: "Weiße Blutzellen heißen mit Fachbegriff ___.", answer: "Leukozyten" },
+            { cat: "Abwehrsystem", q: "Das ___ schützt uns vor Bakterien und Fremdstoffen.", answer: "Abwehrsystem" },
+            { cat: "Abwehrsystem", q: "Wenn Bakterien in den Körper eindringen, nennt man das eine ___.", answer: "Infektion" },
+
+            // VERDAUUNG
+            { cat: "Verdauung", q: "Die ___ hält das Verdauungssystem zusammen.", answer: "Gekröse" },
+            { cat: "Verdauung", q: "Im ___ wird die Nahrung hauptsächlich verdaut.", answer: "Dünndarm" },
+            { cat: "Verdauung", q: "Die ___ leitet die Nahrung direkt in den Magen.", answer: "Speiseröhre" },
+            { cat: "Verdauung", q: "Die ___ produziert Galle für die Verdauung.", answer: "Leber" },
+            { cat: "Verdauung", q: "Die ___ speichert die Galle.", answer: "Gallenblase" },
+            { cat: "Verdauung", q: "Die ___ produziert wichtige Verdauungssäfte.", answer: "Bauchspeicheldrüse" },
+
+            // HERZ
+            { cat: "Herz", q: "Das Herz ist ungefähr so groß wie eine ___.", answer: "Faust" },
+            { cat: "Herz", q: "Das Herz schlägt schneller bei ___, weil die Muskeln mehr Sauerstoff brauchen.", answer: "Anstrengung" },
+
+            // AUGE
+            { cat: "Auge", q: "Durch die ___ fällt das Licht ins Auge.", answer: "Pupille" },
+            { cat: "Auge", q: "Die ___ nimmt das Licht auf und schickt Signale ans Gehirn.", answer: "Netzhaut" },
+            { cat: "Auge", q: "Der ___ leitet die Signale von der Netzhaut zum Gehirn.", answer: "Sehnerv" },
+            { cat: "Auge", q: "Die ___ bündelt das Licht im Auge.", answer: "Linse" },
+            { cat: "Auge", q: "Die durchsichtige Schicht ganz vorne am Auge heißt ___.", answer: "Hornhaut" },
+        ];
+
+        // ===== KARTEIKARTEN LOGIK =====
         let currentCards = [...allCards];
         let currentIndex = 0;
 
         function updateCard() {
             const cardEl = document.getElementById('flashcard');
             cardEl.classList.remove('flipped');
-
             if (currentCards.length === 0) {
                 document.getElementById('card-q').innerHTML = "Keine Karten hier! Wähle ein Thema oben. ☝️";
                 document.getElementById('card-a').innerHTML = "";
                 document.getElementById('progress-text').innerText = "0 / 0";
                 return;
             }
-
             setTimeout(() => {
                 const card = currentCards[currentIndex];
                 document.getElementById('card-q').innerHTML = card.q;
@@ -353,15 +588,109 @@
 
         function changeTopic() {
             const selectedTopic = document.getElementById('topic-select').value;
-            if (selectedTopic === 'alle') {
-                currentCards = [...allCards];
-            } else {
-                currentCards = allCards.filter(card => card.cat === selectedTopic);
-            }
+            if (selectedTopic === 'alle') { currentCards = [...allCards]; }
+            else { currentCards = allCards.filter(card => card.cat === selectedTopic); }
             currentIndex = 0;
             updateCard();
         }
 
+        // ===== SCHRIFTLICHER TEST LOGIK =====
+        let testQuestions = [...allTestQuestions];
+        let testIndex = 0;
+        let testCorrect = 0;
+        let testAnswered = 0;
+
+        function updateTestQuestion() {
+            if (testQuestions.length === 0) {
+                document.getElementById('test-question').innerHTML = "Keine Fragen hier! Wähle ein Thema oben. ☝️";
+                document.getElementById('test-progress').innerText = "0 / 0";
+                return;
+            }
+            const q = testQuestions[testIndex];
+            // Show question with blank as underline
+            document.getElementById('test-question').innerHTML = q.q.replace("___", "<span class='blank'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>");
+            document.getElementById('test-cat').innerText = q.cat;
+            document.getElementById('test-progress').innerText = (testIndex + 1) + " / " + testQuestions.length;
+            document.getElementById('test-answer').value = "";
+            document.getElementById('test-answer').className = "test-input";
+            document.getElementById('test-feedback').innerHTML = "";
+            document.getElementById('test-feedback').className = "test-feedback";
+            document.getElementById('test-answer').disabled = false;
+            document.getElementById('test-answer').focus();
+            document.getElementById('test-prev-btn').disabled = testIndex === 0;
+            document.getElementById('test-next-btn').disabled = testIndex === testQuestions.length - 1;
+            updateTestScore();
+        }
+
+        function checkTestAnswer() {
+            const input = document.getElementById('test-answer');
+            const feedback = document.getElementById('test-feedback');
+            const userAnswer = input.value.trim();
+            const correctAnswer = testQuestions[testIndex].answer;
+
+            if (userAnswer === "") return;
+            if (input.disabled) return; // already answered
+
+            input.disabled = true;
+
+            if (userAnswer === correctAnswer) {
+                input.className = "test-input correct";
+                feedback.innerHTML = "✅ Richtig! Super gemacht!";
+                feedback.className = "test-feedback correct";
+                testCorrect++;
+            } else {
+                input.className = "test-input wrong";
+                feedback.innerHTML = "❌ Leider falsch! Richtig wäre: <b>" + correctAnswer + "</b>";
+                feedback.className = "test-feedback wrong";
+            }
+            testAnswered++;
+            updateTestScore();
+        }
+
+        function updateTestScore() {
+            document.getElementById('test-score').innerHTML = "Punkte: " + testCorrect + " / " + testAnswered + " ✍️";
+        }
+
+        function nextTestQ() {
+            if (testIndex < testQuestions.length - 1) { testIndex++; updateTestQuestion(); }
+        }
+
+        function prevTestQ() {
+            if (testIndex > 0) { testIndex--; updateTestQuestion(); }
+        }
+
+        function changeTestTopic() {
+            const selectedTopic = document.getElementById('test-topic-select').value;
+            if (selectedTopic === 'alle') { testQuestions = [...allTestQuestions]; }
+            else { testQuestions = allTestQuestions.filter(q => q.cat === selectedTopic); }
+            testIndex = 0;
+            testCorrect = 0;
+            testAnswered = 0;
+            updateTestQuestion();
+        }
+
+        // ===== TAB SWITCHING =====
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(t => t.classList.remove('active'));
+
+            if (tab === 'flashcards') {
+                tabs[0].classList.add('active');
+                document.getElementById('flashcard-section').classList.add('active');
+                document.getElementById('flashcard-section').style.display = 'flex';
+                document.getElementById('test-section').classList.remove('active');
+                document.getElementById('test-section').style.display = 'none';
+            } else {
+                tabs[1].classList.add('active');
+                document.getElementById('flashcard-section').classList.remove('active');
+                document.getElementById('flashcard-section').style.display = 'none';
+                document.getElementById('test-section').classList.add('active');
+                document.getElementById('test-section').style.display = 'block';
+                updateTestQuestion();
+            }
+        }
+
+        // App-Start
         updateCard();
     </script>
 </body>
