@@ -416,7 +416,7 @@
             <div class="category-badge" id="test-cat" style="position:relative; top:0; margin-bottom:15px;">Kategorie</div>
             <div class="test-question" id="test-question">Frage lädt...</div>
             <div class="test-input-row">
-                <input type="text" class="test-input" id="test-answer" placeholder="Deine Antwort..." autocomplete="off" onkeydown="if(event.key==='Enter')checkTestAnswer()">
+                <input type="text" class="test-input" id="test-answer" placeholder="Deine Antwort..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter')checkTestAnswer()">
                 <button class="test-check-btn" onclick="checkTestAnswer()">Prüfen ✓</button>
             </div>
             <div class="test-feedback" id="test-feedback"></div>
