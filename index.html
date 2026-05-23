@@ -719,6 +719,7 @@
 
                 // Restart after short delay
                 setTimeout(() => {
+                    shuffleArray(testQuestions);
                     testIndex = 0;
                     testCorrect = 0;
                     testWrong = 0;
@@ -753,6 +754,7 @@
         }
 
         function restartTest() {
+            shuffleArray(testQuestions);
             testIndex = 0;
             testCorrect = 0;
             testWrong = 0;
@@ -769,10 +771,19 @@
             if (testIndex > 0) { testIndex--; updateTestQuestion(); }
         }
 
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
         function changeTestTopic() {
             const selectedTopic = document.getElementById('test-topic-select').value;
             if (selectedTopic === 'alle') { testQuestions = [...allTestQuestions]; }
             else { testQuestions = allTestQuestions.filter(q => q.cat === selectedTopic); }
+            shuffleArray(testQuestions);
             testIndex = 0;
             testCorrect = 0;
             testWrong = 0;
@@ -798,6 +809,7 @@
                 document.getElementById('flashcard-section').style.display = 'none';
                 document.getElementById('test-section').classList.add('active');
                 document.getElementById('test-section').style.display = 'block';
+                shuffleArray(testQuestions);
                 updateTestQuestion();
             }
         }
