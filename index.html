@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Umfassender Bio-Lerncoach</title>
+    <style>
+        :root {
+            --primary: #2b4c7e;
+            --secondary: #2a9d8f;
+            --bg: #f8f9fa;
+            --text: #212529;
+            --card-front-border: #4a90e2;
+            --card-back-border: #e76f51;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .select-container {
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 550px;
+            display: flex;
+            gap: 10px;
+        }
+
+        select {
+            flex: 1;
+            padding: 12px;
+            font-size: 15px;
+            border-radius: 8px;
+            border: 2px solid var(--primary);
+            background: white;
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* 3D Flashcard Design */
+        .card-container {
+            width: 100%;
+            max-width: 550px;
+            height: 360px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            border-radius: 14px;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .card-front {
+            background: white;
+            border-top: 8px solid var(--card-front-border);
+        }
+
+        .card-back {
+            background: #f1f5f9;
+            transform: rotateY(180deg);
+            border-top: 8px solid var(--card-back-border);
+        }
+
+        .category-badge {
+            position: absolute;
+            top: 15px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            color: #64748b;
+            background: #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .card-text {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 15px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        /* Navigationsleiste */
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            width: 100%;
+            max-width: 550px;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:disabled {
+            background-color: #cbd5e1;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .progress {
+            font-weight: 700;
+            font-size: 15px;
+            min-width: 70px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Großes Bio-Test-Quiz</h1>
+        <p>Tippe auf die Karte, um die Lösung zu sehen</p>
+    </header>
+
+    <div class="select-container">
+        <select id="topic-select" onchange="changeTopic()">
+            <option value="alle">Alle Themen gemischt (Massentest)</option>
+            <option value="Bewegungsapparat">1. Bewegungsapparat</option>
+            <option value="Nase">2. Die Nase</option>
+            <option value="Zunge">3. Die Zunge</option>
+            <option value="Gehirn">4. Das Gehirn</option>
+            <option value="Lunge">5. Die Lunge</option>
+            <option value="Ohr">6. Das Ohr</option>
+            <option value="Abwehrsystem">7. Das Abwehrsystem</option>
+            <option value="Verdauung">8. Das Verdauungssystem</option>
+            <option value="Herz">9. Das Herz</option>
+            <option value="Auge">10. Das Auge</option>
+        </select>
+    </div>
+
+    <div class="card-container" onclick="flipCard()">
+        <div class="card" id="flashcard">
+            <div class="card-face card-front">
+                <span class="category-badge" id="card-cat-front">Kategorie</span>
+                <div class="card-text" id="card-q">Frage lädt...</div>
+                <div class="hint">🔄 Klicken zum Umdrehen</div>
+            </div>
+            <div class="card-face card-back">
+                <span class="category-badge" id="card-cat-back">Lösung</span>
+                <div class="card-text" id="card-a">Antwort lädt...</div>
+                <div class="hint">🔄 Klicken für Vorderseite</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="prev-btn" onclick="prevCard(event)">⬅️ Zurück</button>
+        <span class="progress" id="progress-text">0 / 0</span>
+        <button id="next-btn" onclick="nextCard(event)">Weiter ➡️</button>
+    </div>
+
+    <script>
+        // Gigantischer Fragenpool, der jede einzelne Information der Seiten abdeckt
+        const allCards = [
+            // TOPIC 1: BEWEGUNGSAPPARAT
+            { cat: "Bewegungsapparat", q: "Was ist der Bewegungsapparat definitionsgemäß?", a: "Ein komplexes Organsystem, das aus verschiedenen Teilen zusammengebaut ist, die zusammenarbeiten und bewegen." },
+            { cat: "Bewegungsapparat", q: "Wofür dient der Bewegungsapparat im Körper?", a: "Für die Sicherung der Gestalt und Form sowie für die Stabilität." },
+            { cat: "Bewegungsapparat", q: "Richtig oder Falsch:<br>Der gesamte Bewegungsapparat ist absolut identisch mit dem passiven Bewegungsapparat.", a: "<b>Falsch.</b> Er besteht aus aktiven Teilen (Muskeln) und passiven Teilen (Knochen, Gelenke)." },
+            { cat: "Bewegungsapparat", q: "Richtig oder Falsch:<br>Der Bewegungsapparat gibt uns auch Stabilität und Form.", a: "<b>Richtig.</b>" },
+            { cat: "Bewegungsapparat", q: "Richtig oder Falsch:<br>Sind Muskeln auch im Bewegungsapparat enthalten?", a: "<b>Richtig (Ja).</b> Muskeln bilden den aktiven Teil." },
+            { cat: "Bewegungsapparat", q: "Welcher lateinische Fachbegriff wird für den Oberschenkelknochen verwendet?", a: "<b>Femur</b>" },
+            { cat: "Bewegungsapparat", q: "Welcher lateinische Fachbegriff bezeichnet das Schienbein?", a: "<b>Tibia</b>" },
+            { cat: "Bewegungsapparat", q: "Nenne das Knochengebilde im Zentrum des Körpers, das die Beine mit der Wirbelsäule verbindet.", a: "<b>Becken</b>" },
+            { cat: "Bewegungsapparat", q: "Löse das Rätsel-Teil:<br>Welcher Unterarmknochen wird gesucht (vertikal im Kreuzworträtsel)?", a: "<b>Speiche</b>" },
+            { cat: "Bewegungsapparat", q: "Lückentext-Rätsel:<br>'Es gibt uns Form und Haltung. Besteht aus vielen Wirbeln.' Was ist gesucht?", a: "<b>Wirbelsaeure</b> (Wirbelsäule)" },
+            { cat: "Bewegungsapparat", q: "Welcher Knochenkäfig beschützt die Lungen und das Herz?", a: "Der <b>Brustkorb</b> (bzw. die Rippen)." },
+            { cat: "Bewegungsapparat", q: "Wie nennt man das gesamte knöcherne Grundgerüst des Menschen?", a: "<b>Skelet</b> (Skelett)" },
+
+            // TOPIC 2: DIE NASE
+            { cat: "Nase", q: "Richtig oder Falsch:<br>Wehrt die Nase die Bakterien mit Nasenschleim ab?", a: "<b>Richtig.</b>" },
+            { cat: "Nase", q: "Richtig oder Falsch:<br>Man hat über 100 Nasenhaare in der Nase.", a: "<b>Richtig.</b>" },
+            { cat: "Nase", q: "Richtig oder Falsch:<br>Wenn die Nase trocken ist, blutet man nicht.", a: "<b>Falsch.</b> Gerade bei Trockenheit platzen Gefäße schneller." },
+            { cat: "Nase", q: "Richtig oder Falsch:<br>Die Nase blutet, wenn man sich gestoßen hat.", a: "<b>Richtig.</b>" },
+            { cat: "Nase", q: "Richtig oder Falsch:<br>Die Nasenhaare wehren Bakterien ab und dann geht's in den Magen.", a: "<b>Richtig.</b> (Durch das Schlucken des abgefangenen Schleims)." },
+            { cat: "Nase", q: "Richtig oder Falsch:<br>Der Schleim ist wichtig, weil er Bakterien rausspuckt.", a: "<b>Richtig.</b>" },
+            { cat: "Nase", q: "Was beschützt die Nase explizit vor Bakterien?<br>a) Die Nasenhaare<br>b) Die Schleimhaut<br>c) Oder Beide", a: "<b>c) Oder Beide</b>" },
+            { cat: "Nase", q: "Nenne mindestens 4 anatomische Begriffe der Nase, die im Schaubild markiert sind.", a: "Frontalinus (Stirnhöhle), Riechkolben, Siebben (Siebbein), Riechbahn, Riechnerven, Nasengänge, Nasenvorhof." },
+
+            // TOPIC 3: DIE ZUNGE
+            { cat: "Zunge", q: "Womit ist die Oberfläche der Zunge bedeckt?", a: "Mit einer speziellen <b>Schleimhaut</b>." },
+            { cat: "Zunge", q: "Womit ist die Zunge unten fest verbunden?", a: "Mit dem <b>Mundboden</b>." },
+            { cat: "Zunge", q: "Woraus besteht der Körper der Zunge, der ihr eine große Beweglichkeit verleiht?", a: "Aus äußeren <b>Muskeln</b>." },
+            { cat: "Zunge", q: "Aus welchen 3 Komponenten besteht der weiße Belag auf der Zunge meistens?", a: "Aus der Ansammlung von abgestorbenen <b>Zellen, Nahrungsresten</b> und <b>Schleim</b>." },
+            { cat: "Zunge", q: "Nenne die 5 offiziellen Geschmacksbereiche, die auf der Zungenkarte eingetragen sind.", a: "1. Bitter<br>2. Umami<br>3. Sauer<br>4. Süß<br>5. Salzig" },
+            { cat: "Zunge", q: "Richtig oder Falsch (Mini Quiz):<br>Kann die Zunge spüren, ob etwas hart/weich und heiß ist?", a: "<b>Ja.</b>" },
+            { cat: "Zunge", q: "Richtig oder Falsch (Mini Quiz):<br>Hilft die Nase, den Geruch gelber zu machen?", a: "<b>Nein.</b> (Diese Frage im Arbeitsblatt ist fehlerhaft/ein Scherz)." },
+            { cat: "Zunge", q: "Richtig oder Falsch (Mini Quiz):<br>Haben Geschmackspapillen viele Nervenzellen ('Genes Zellen')?", a: "<b>Ja.</b>" },
+            { cat: "Zunge", q: "Richtig oder Falsch (Mini Quiz):<br>Wenn man jeden Tag Zähne putzt, dann wird die Zunge hellrosa.", a: "<b>Ja.</b>" },
+            { cat: "Zunge", q: "Wo genau liegt der Geschmack 'Umami' auf der Zungenkarte?", a: "Im hinteren Bereich, direkt unterhalb von 'Bitter'." },
+
+            // TOPIC 4: DAS GEHIRN
+            { cat: "Gehirn", q: "Nenne die 4 im Diagramm beschrifteten Hauptbestandteile des Gehirns.", a: "1. Großhirn<br>2. Zwischenhirn<br>3. Kleinhirn<br>4. Hirnstamm" },
+            { cat: "Gehirn", q: "Was kann ein Mensch noch tun, wenn er klinisch hirntot ist, aber an einer Maschine angeschlossen bleibt?<br>a) zwinkern<br>b) atmen<br>c) gar nichts", a: "<b>b) atmen</b> (durch die maschinelle Unterstützung)." },
+            { cat: "Gehirn", q: "Ist das Rückenmark mit den Nerven vom Bein verbunden? (Ja/Nein)", a: "<b>Ja.</b>" },
+            { cat: "Gehirn", q: "Wie reagiert das Gehirn, wenn es starker Kälte ausgesetzt wird?", a: "Es wird <b>unaufmerksamer</b> und <b>langsamer</b>." },
+            { cat: "Gehirn", q: "Wovon berichten fast gestorbene Menschen laut Lückentext häufig?", a: "Von einem <b>hellen Licht</b> und einem <b>Film vom Leben</b> (schöne Momente beim Sterben)." },
+            { cat: "Gehirn", q: "Kann das Gehirn sofort lügen oder muss es das erst mühsam üben?", a: "Es kann es nicht sofort, das Gehirn <b>muss üben zu lügen</b>." },
+            { cat: "Gehirn", q: "Welches System bildet die absolute Schlüsselregion für unsere Emotionen?", a: "Das <b>Limbische System</b> (Antwort: Ja)." },
+            { cat: "Gehirn", q: "Welche fundamentale Rolle übernimmt der Hypothalamus?<br>a) Körpertemperatur kontrollieren<br>b) neue Dinge lernen<br>c) Gedanken speichern", a: "<b>a) Körpertemperatur kontrollieren</b>" },
+
+            // TOPIC 5: DIE LUNGE
+            { cat: "Lunge", q: "Welche Hauptaufgabe hat die Lunge im Atmungssystem?", a: "Sie sorgt dafür, dass der <b>Sauerstoff</b> in die Lunge und somit in den Körper kommt." },
+            { cat: "Lunge", q: "Aus wie vielen Abschnitten (Flügeln) besteht die Lunge?", a: "Aus zwei <b>Lungenflügeln</b>." },
+            { cat: "Lunge", q: "Wovon sind beide Lungenflügel im Inneren komplett durchzogen?", a: "Von einem System aus <b>luftleitenden Wegen</b>." },
+            { cat: "Lunge", q: "Richtig oder Falsch:<br>Man braucht erst fünf Zigaretten, um der Lunge dauerhaft zu schaden.", a: "<b>Falsch.</b> Jede Zigarette schadet der Lunge sofort." },
+            { cat: "Lunge", q: "Stimmt es, dass eine Pneumokoniose (Staublunge) vollständig heilbar ist?", a: "<b>Falsch.</b> Sie ist chronisch und nicht heilbar." },
+            { cat: "Lunge", q: "Wie müssen Menschen reagieren, die unter einem akuten Lungenödem leiden?", a: "Sie müssen <b>schnell zum Krankenhaus</b> gehen, da ein Lungenödem sehr gefährlich ist." },
+            { cat: "Lunge", q: "Nenne die 3 Beschriftungen der Atemwegs- und Herzgrafik.", a: "1. Luftröhre<br>2. Rechter Lungenflügel<br>3. Das Herz" },
+            { cat: "Lunge", q: "Wie viele Lungenbläschen besitzt eine gesunde Lunge ungefähr?", a: "Ungefähr <b>300 Millionen</b>." },
+            { cat: "Lunge", q: "Was versteht man medizinisch unter dem Begriff 'Pneumokoniose'?", a: "Die <b>Staublunge</b>." },
+            { cat: "Lunge", q: "Welche Atmungsform hilft uns primär, wenn wir uns stark körperlich anstrengen müssen (z.B. im Sport)?", a: "Die <b>Mundatmung</b>." },
+
+            // TOPIC 6: DAS OHR
+            { cat: "Ohr", q: "Wie heißt der Fachbegriff für das Gleichgewichtsorgan und was macht es?", a: "<b>Vestibularapparat</b>. Es hilft uns, Bewegungen zu erkennen." },
+            { cat: "Ohr", q: "In welchen zwei unterschiedlichen Beschaffenheiten kann Ohrenschmalz vorkommen?", a: "Es kann <b>trocken</b> oder <b>feucht</b> sein." },
+            { cat: "Ohr", q: "Beschreibe die dreistufige Kette des Hörens: Ohr ➡️ [?] ➡️ Gehirn.", a: "Das Ohr nimmt Töne auf und verstärkt sie, das <b>Gehirn</b> verarbeitet sie – so können wir hören." },
+            { cat: "Ohr", q: "Wann genau entsteht ein Druckgefühl im Ohr?", a: "Wenn der Luftdruck im <b>Mittelohr</b> nicht zum <b>Außendruck</b> passt und die <b>Ohrtrompete</b> den Druck nicht schnell genug ausgleicht." },
+            { cat: "Ohr", q: "Nenne die 3 Strukturen des Ohrs, die auf dem Arbeitsblatt beschriftet wurden.", a: "1. Schnecke<br>2. Mittelohr<br>3. Aussenohr" },
+
+            // TOPIC 7: DAS ABWEHRSYSTEM
+            { cat: "Abwehrsystem", q: "Was ist die biologische Hauptaufgabe des Abwehrsystems?<br>a) macht dich krank<br>b) schützt dich vor Bakterien und Fremdstoffen<br>c) hilft beim Lernen", a: "<b>b) Sie schützen dich vor Bakterien und Fremdstoffen.</b>" },
+            { cat: "Abwehrsystem", q: "Was bedeutet es biologisch, wenn du bei einer Infektion Fieber bekommst?", a: "Es heißt, dass deine <b>Zellen hart arbeiten</b>, um dich vor Bakterien zu schützen." },
+            { cat: "Abwehrsystem", q: "Bonusfrage: Was sind Leukozyten?", a: "<b>Weisse Blutzellen</b> (Weiße Blutkörperchen)." },
+            { cat: "Abwehrsystem", q: "Nenne 3 wichtige Suchwörter aus dem Abwehr-Rätsel.", a: "Bakterien, Blutzellen, schützt, Infektion, Abwehrsystem." },
+
+            // TOPIC 8: DAS VERDAUUNGSSYSTEM
+            { cat: "Verdauung", q: "Was ist die 'Gekröse' und welche Aufgabe hat sie?", a: "Sie hält das Verdauungssystem zusammen. Sie ist eine doppelte Falte des Bauchfells und sieht aus wie rosa-lackierte Würstchen." },
+            { cat: "Verdauung", q: "In welchem Darmabschnitt wird die Nahrung intensiv weiterverdaut und resorbiert?", a: "Im <b>Dünndarm</b>." },
+            { cat: "Verdauung", q: "In welche Bausteine wird die Nahrung im Dünndarm zerlegt? Nenne 3 Beispiele.", a: "In ganz kleine Bausteine wie <b>Vitamine, Aminosäuren</b> und <b>Fettsäuren</b>." },
+            { cat: "Verdauung", q: "Richtig oder Falsch:<br>Im Dickdarm wird die Nahrung hauptsächlich weiter verdaut.", a: "<b>Falsch.</b> (Der Hauptteil der Verdauung und Aufnahme findet im Dünndarm statt; im Dickdarm wird vor allem Wasser entzogen)." },
+            { cat: "Verdauung", q: "Richtig oder Falsch:<br>Die Speiseröhre leitet die Nahrung direkt in den Magen.", a: "<b>Richtig.</b>" },
+            { cat: "Verdauung", q: "Ordne die Nummern 1, 2, 3 und 4 der Organ-Abbildung richtig zu.", a: "1: Speiseröhre<br>2: Magen<br>3: Leber<br>4: Gallenblase" },
+            { cat: "Verdauung", q: "Welche Organe liegen an Position 5, 6 und 10 der Verdauungsgrafik?", a: "5: Bauchspeicheldrüse<br>6: Dünndarm<br>10: Anus" },
+
+            // TOPIC 9: DAS HERZ
+            { cat: "Herz", q: "Richtig oder Falsch:<br>Das menschliche Herz besitzt exakt 3 Kammern.", a: "<b>Falsch.</b> (Das Herz hat laut der Kontrollmatrix auf Seite 13 keine 3 Kammern)." },
+            { cat: "Herz", q: "Richtig oder Falsch:<br>Das Herz zählt zu den wichtigsten Organen des menschlichen Körpers.", a: "<b>Richtig.</b>" },
+            { cat: "Herz", q: "Richtig oder Falsch:<br>Das Herz schlägt bei körperlicher Anstrengung automatisch schneller.", a: "<b>Richtig.</b>" },
+            { cat: "Herz", q: "Wie groß ist das menschliche Herz ungefähr?<br>a) So groß wie ein Gehirn<br>b) Eine Faust groß<br>c) So groß wie ein Fuß", a: "<b>b) Eine Faust groß</b>" },
+            { cat: "Herz", q: "Warum muss das Herz bei Anstrengung schneller schlagen?", a: "<b>Weil die Muskeln mehr Stoffe (und Sauerstoff) brauchen.</b>" },
+
+            // TOPIC 10: DAS AUGE
+            { cat: "Auge", q: "Richtig oder Falsch:<br>Die Augen sind mit Hornhaut, Sehnerv und dem Hirnstamm gebaut.", a: "<b>Ja (Richtig).</b>" },
+            { cat: "Auge", q: "Durch welche Struktur fällt das Licht direkt in das Innere des Auges?", a: "Durch die <b>Pupille</b>." },
+            { cat: "Auge", q: "Richtig oder Falsch:<br>Es gibt ausschließlich eine einzige, universelle Art von Blindheit.", a: "<b>Nein (Falsch).</b> Es gibt verschiedene Arten von Blindheit." },
+            { cat: "Auge", q: "Ist es für die Augengesundheit förderlich, wenn man extrem viel Zeit vor einem Bildschirm verbringt? (Ja/Nein)", a: "<b>Nein.</b> Man soll nicht zu viel auf Bildschirme gucken." },
+            { cat: "Auge", q: "Was genau sehen Menschen, die unter einer Rot-Grün-Schwäche leiden?", a: "Sie sehen die grüne und rote Seite als <b>gleiche Farbe</b> (bzw. als Khaki-/Kaka-Farbe)." },
+            { cat: "Auge", q: "Nenne die 4 wichtigsten Begriffe des Auges, die im Schaubild manuell beschriftet wurden.", a: "1. Hornhaut<br>2. Pupille<br>3. Linse<br>4. Netzhaut (schickt elektrische Signale zum Hirn via Sehnerv)" }
+        ];
+
+        let currentCards = [...allCards];
+        let currentIndex = 0;
+
+        function updateCard() {
+            const cardEl = document.getElementById('flashcard');
+            cardEl.classList.remove('flipped');
+            
+            if(currentCards.length === 0) {
+                document.getElementById('card-q').innerHTML = "Keine Karten in dieser Kategorie vorhanden.";
+                document.getElementById('card-a').innerHTML = "";
+                document.getElementById('progress-text').innerText = "0 / 0";
+                return;
+            }
+
+            // Kurze Verzögerung beim Textwechsel, falls die Karte noch zurückrotiert
+            setTimeout(() => {
+                const card = currentCards[currentIndex];
+                document.getElementById('card-q').innerHTML = card.q;
+                document.getElementById('card-a').innerHTML = card.a;
+                document.getElementById('card-cat-front').innerText = card.cat;
+                document.getElementById('card-cat-back').innerText = card.cat + " (Lösung)";
+                document.getElementById('progress-text').innerText = `${currentIndex + 1} / ${currentCards.length}`;
+                
+                document.getElementById('prev-btn').disabled = currentIndex === 0;
+                document.getElementById('next-btn').disabled = currentIndex === currentCards.length - 1;
+            }, cardEl.classList.contains('flipped') ? 250 : 0);
+        }
+
+        function flipCard() {
+            if(currentCards.length === 0) return;
+            document.getElementById('flashcard').classList.toggle('flipped');
+        }
+
+        function nextCard(event) {
+            event.stopPropagation(); 
+            if (currentIndex < currentCards.length - 1) {
+                currentIndex++;
+                updateCard();
+            }
+        }
+
+        function prevCard(event) {
+            event.stopPropagation();
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateCard();
+            }
+        }
+
+        function changeTopic() {
+            const selectedTopic = document.getElementById('topic-select').value;
+            if (selectedTopic === 'alle') {
+                currentCards = [...allCards];
+            } else {
+                currentCards = allCards.filter(card => card.cat === selectedTopic);
+            }
+            currentIndex = 0;
+            updateCard();
+        }
+
+        // App-Start
+        updateCard();
+    </script>
+</body>
+</html>
