@@ -26,21 +26,9 @@
             min-height: 100vh;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        h1 {
-            margin-bottom: 5px;
-            color: var(--primary);
-            font-size: 1.8rem;
-        }
-
-        header p {
-            font-size: 1rem;
-            color: #636e72;
-        }
+        header { text-align: center; margin-bottom: 15px; }
+        h1 { margin-bottom: 5px; color: var(--primary); font-size: 1.8rem; }
+        header p { font-size: 1rem; color: #636e72; }
 
         .select-container {
             margin-bottom: 20px;
@@ -78,9 +66,7 @@
             border-radius: 16px;
         }
 
-        .card.flipped {
-            transform: rotateY(180deg);
-        }
+        .card.flipped { transform: rotateY(180deg); }
 
         .card-face {
             position: absolute;
@@ -98,16 +84,8 @@
             overflow-y: auto;
         }
 
-        .card-front {
-            background: white;
-            border-top: 8px solid var(--card-front-border);
-        }
-
-        .card-back {
-            background: #f8f9fa;
-            transform: rotateY(180deg);
-            border-top: 8px solid var(--card-back-border);
-        }
+        .card-front { background: white; border-top: 8px solid var(--card-front-border); }
+        .card-back { background: #f8f9fa; transform: rotateY(180deg); border-top: 8px solid var(--card-back-border); }
 
         .category-badge {
             position: absolute;
@@ -122,15 +100,10 @@
             border-radius: 20px;
         }
 
-        .card-text {
-            font-size: 1.15rem;
-            line-height: 1.6;
-            font-weight: 500;
-            margin-top: 10px;
-        }
+        .card-text { font-size: 1.15rem; line-height: 1.6; font-weight: 500; margin-top: 10px; }
 
         .card-text img {
-            max-width: 150px;
+            max-width: 140px;
             width: 100%;
             margin-top: 8px;
             border-radius: 8px;
@@ -171,39 +144,14 @@
             flex: 1;
         }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
-        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3); }
+        button:disabled { background-color: #dfe6e9; color: #b2bec3; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        button:disabled {
-            background-color: #dfe6e9;
-            color: #b2bec3;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .progress {
-            font-weight: 700;
-            font-size: 15px;
-            min-width: 70px;
-            text-align: center;
-            color: var(--primary);
-        }
-
-        .score-bar {
-            margin-top: 15px;
-            width: 100%;
-            max-width: 550px;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #636e72;
-        }
+        .progress { font-weight: 700; font-size: 15px; min-width: 70px; text-align: center; color: var(--primary); }
+        .score-bar { margin-top: 15px; width: 100%; max-width: 550px; text-align: center; font-size: 0.9rem; color: #636e72; }
     </style>
 </head>
 <body>
-
     <header>
         <h1>🧬 Jennifers Bio-Quiz</h1>
         <p>Tippe auf die Karte, um die Antwort zu sehen! 👆</p>
@@ -249,120 +197,114 @@
     <div class="score-bar" id="score-bar">Viel Erfolg beim Lernen! 🌟</div>
 
     <script>
-        // Bilder-URLs (Wikimedia Commons - frei nutzbar)
-        const IMG_SKELETT = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Human_skeleton_front_de.svg/250px-Human_skeleton_front_de.svg.png";
-        const IMG_GEHIRN = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Brain_human_sagittal_section.svg/250px-Brain_human_sagittal_section.svg.png";
-        const IMG_VERDAUUNG = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Digestive_system_diagram_de.svg/250px-Digestive_system_diagram_de.svg.png";
-        const IMG_AUGE = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Schematic_diagram_of_the_human_eye_en.svg/250px-Schematic_diagram_of_the_human_eye_en.svg.png";
-
         const allCards = [
             // === BEWEGUNGSAPPARAT ===
-            { cat: "Bewegungsapparat", q: "Was ist der Bewegungsapparat?", a: "Ein System aus vielen Teilen (Knochen, Muskeln, Gelenke), die zusammenarbeiten, damit wir uns bewegen können." },
-            { cat: "Bewegungsapparat", q: "Wofür brauchen wir den Bewegungsapparat?", a: "Er gibt uns <b>Form, Haltung</b> und <b>Stabilität</b> – ohne ihn wären wir wie ein Pudding! 🍮" },
-            { cat: "Bewegungsapparat", q: "Richtig oder Falsch:<br>Der Bewegungsapparat ist das Gleiche wie der passive Bewegungsapparat.", a: "<b>Falsch!</b> Er hat einen aktiven Teil (Muskeln) UND einen passiven Teil (Knochen, Gelenke)." },
-            { cat: "Bewegungsapparat", q: "Richtig oder Falsch:<br>Der Bewegungsapparat gibt uns Stabilität und Form.", a: "<b>Richtig! ✅</b>" },
-            { cat: "Bewegungsapparat", q: "Richtig oder Falsch:<br>Gehören Muskeln auch zum Bewegungsapparat?", a: "<b>Richtig! ✅</b> Muskeln sind der aktive Teil." },
-            { cat: "Bewegungsapparat", q: "Wie heißt der Oberschenkelknochen auf Latein?", a: "<b>Femur</b> 🦴" },
-            { cat: "Bewegungsapparat", q: "Wie heißt das Schienbein auf Latein?", a: "<b>Tibia</b> 🦴" },
-            { cat: "Bewegungsapparat", q: "Welcher Knochen verbindet die Beine mit der Wirbelsäule?", a: "Das <b>Becken</b>" },
-            { cat: "Bewegungsapparat", q: "Welcher Knochen ist am Unterarm und klingt wie ein Teil vom Fahrrad?", a: "Die <b>Speiche</b> 🚲" },
-            { cat: "Bewegungsapparat", q: "Was gibt uns Form und Haltung und besteht aus vielen Wirbeln?", a: "Die <b>Wirbelsäule</b>" },
-            { cat: "Bewegungsapparat", q: "Welcher Knochenkäfig beschützt Lunge und Herz?", a: "Der <b>Brustkorb</b> (die Rippen) 🫁❤️" },
-            { cat: "Bewegungsapparat", q: "Wie nennt man das ganze Knochengerüst des Menschen?", a: "Das <b>Skelett</b>" },
-            { cat: "Bewegungsapparat", q: "Schau dir das Skelett an – wo ist der Femur?<br><img src='" + IMG_SKELETT + "'>", a: "Der <b>Femur</b> ist der große Knochen im Oberschenkel!" },
-            { cat: "Bewegungsapparat", q: "Schau dir das Skelett an – wo ist die Tibia?<br><img src='" + IMG_SKELETT + "'>", a: "Die <b>Tibia</b> ist das Schienbein – der vordere Knochen im Unterschenkel!" },
+            { cat: "Bewegungsapparat", q: "Erkläre kurz: Was versteht man unter dem Bewegungsapparat?", a: "Ein System aus Knochen, Muskeln und Gelenken, die zusammenarbeiten, damit wir uns bewegen können." },
+            { cat: "Bewegungsapparat", q: "Welche drei Aufgaben hat der Bewegungsapparat?", a: "Er gibt uns <b>Form</b>, <b>Haltung</b> und <b>Stabilität</b>." },
+            { cat: "Bewegungsapparat", q: "Stimmt das? Der passive Bewegungsapparat und der gesamte Bewegungsapparat sind dasselbe.", a: "<b>Falsch!</b> Der gesamte Bewegungsapparat hat einen aktiven Teil (Muskeln) UND einen passiven Teil (Knochen, Gelenke)." },
+            { cat: "Bewegungsapparat", q: "Stimmt das? Ohne den Bewegungsapparat hätten wir keine Stabilität.", a: "<b>Richtig! ✅</b> Er sorgt für Stabilität und Form." },
+            { cat: "Bewegungsapparat", q: "Zählen Muskeln zum Bewegungsapparat – ja oder nein?", a: "<b>Ja! ✅</b> Sie bilden den aktiven Teil des Bewegungsapparats." },
+            { cat: "Bewegungsapparat", q: "Der große Knochen im Oberschenkel hat einen lateinischen Namen. Welchen?", a: "<b>Femur</b> 🦴" },
+            { cat: "Bewegungsapparat", q: "Wie lautet der Fachbegriff für das Schienbein?", a: "<b>Tibia</b> 🦴" },
+            { cat: "Bewegungsapparat", q: "Welches Knochenteil sitzt zwischen Wirbelsäule und Beinen?", a: "Das <b>Becken</b>" },
+            { cat: "Bewegungsapparat", q: "Am Unterarm gibt es einen Knochen, der genauso heißt wie ein Fahrradteil. Welcher?", a: "Die <b>Speiche</b> 🚲" },
+            { cat: "Bewegungsapparat", q: "Sie besteht aus vielen Wirbeln und gibt uns Haltung. Was ist das?", a: "Die <b>Wirbelsäule</b>" },
+            { cat: "Bewegungsapparat", q: "Welche Knochen bilden einen Käfig um Herz und Lunge?", a: "Der <b>Brustkorb</b> (die Rippen) 🫁❤️" },
+            { cat: "Bewegungsapparat", q: "Wie heißt das komplette Knochengerüst unseres Körpers?", a: "Das <b>Skelett</b>" },
+            { cat: "Bewegungsapparat", q: "Zeige auf dem Bild: Wo sitzt der Femur?<br><img src='skelett.png'>", a: "Der <b>Femur</b> ist der lange Knochen im Oberschenkel!" },
+            { cat: "Bewegungsapparat", q: "Finde die Tibia auf dem Bild!<br><img src='skelett.png'>", a: "Die <b>Tibia</b> ist das Schienbein – vorne am Unterschenkel!" },
 
             // === DIE NASE ===
-            { cat: "Nase", q: "Richtig oder Falsch:<br>Die Nase wehrt Bakterien mit Nasenschleim ab.", a: "<b>Richtig! ✅</b> Der Schleim fängt die Bakterien ein." },
-            { cat: "Nase", q: "Richtig oder Falsch:<br>Man hat über 100 Nasenhaare in der Nase.", a: "<b>Richtig! ✅</b> Die Haare filtern Dreck und Bakterien." },
-            { cat: "Nase", q: "Richtig oder Falsch:<br>Wenn die Nase trocken ist, blutet man nicht.", a: "<b>Falsch! ❌</b> Gerade wenn die Nase trocken ist, platzen die kleinen Blutgefäße leichter." },
-            { cat: "Nase", q: "Richtig oder Falsch:<br>Die Nase blutet, wenn man sich gestoßen hat.", a: "<b>Richtig! ✅</b>" },
-            { cat: "Nase", q: "Richtig oder Falsch:<br>Die Nasenhaare fangen Bakterien ab und dann gehen sie in den Magen.", a: "<b>Richtig! ✅</b> Wir schlucken den Schleim mit den Bakterien runter." },
-            { cat: "Nase", q: "Richtig oder Falsch:<br>Der Schleim ist wichtig, weil er Bakterien rausspuckt.", a: "<b>Richtig! ✅</b>" },
-            { cat: "Nase", q: "Was beschützt die Nase vor Bakterien?<br>a) Die Nasenhaare<br>b) Die Schleimhaut<br>c) Beide zusammen", a: "<b>c) Beide zusammen! 🤝</b> Nasenhaare UND Schleimhaut arbeiten als Team." },
-            { cat: "Nase", q: "Nenne 4 Teile der Nase, die du kennen solltest!", a: "Stirnhöhle, Riechkolben, Riechnerven, Nasengänge, Nasenvorhof 👃" },
+            { cat: "Nase", q: "Stimmt das? Nasenschleim hilft dabei, Bakterien abzuwehren.", a: "<b>Richtig! ✅</b> Der Schleim fängt Bakterien ein wie eine Klebefalle." },
+            { cat: "Nase", q: "Stimmt das? In unserer Nase wachsen mehr als 100 Härchen.", a: "<b>Richtig! ✅</b> Sie filtern Schmutz und Keime aus der Luft." },
+            { cat: "Nase", q: "Stimmt das? Bei einer trockenen Nase kann man kein Nasenbluten bekommen.", a: "<b>Falsch! ❌</b> Gerade bei Trockenheit platzen die feinen Blutgefäße leichter." },
+            { cat: "Nase", q: "Stimmt das? Ein Stoß auf die Nase kann Nasenbluten auslösen.", a: "<b>Richtig! ✅</b>" },
+            { cat: "Nase", q: "Stimmt das? Bakterien, die von den Nasenhaaren gefangen werden, landen am Ende im Magen.", a: "<b>Richtig! ✅</b> Wir schlucken den Schleim mit den Bakterien herunter." },
+            { cat: "Nase", q: "Stimmt das? Der Nasenschleim ist unwichtig und hat keine Aufgabe.", a: "<b>Falsch! ❌</b> Er ist super wichtig, weil er Bakterien einfängt und rausbefördert." },
+            { cat: "Nase", q: "Was schützt die Nase vor Keimen – Nasenhaare, Schleimhaut oder beides?", a: "<b>Beides zusammen! 🤝</b> Nasenhaare UND Schleimhaut arbeiten als Team." },
+            { cat: "Nase", q: "Zähle vier Teile auf, die zur Nase gehören!", a: "Stirnhöhle, Riechkolben, Riechnerven, Nasengänge, Nasenvorhof 👃" },
 
             // === DIE ZUNGE ===
-            { cat: "Zunge", q: "Womit ist die Oberfläche der Zunge bedeckt?", a: "Mit einer speziellen <b>Schleimhaut</b>" },
-            { cat: "Zunge", q: "Womit ist die Zunge unten fest verbunden?", a: "Mit dem <b>Mundboden</b>" },
-            { cat: "Zunge", q: "Woraus besteht die Zunge, damit sie sich so gut bewegen kann?", a: "Aus <b>Muskeln</b> – deshalb ist sie so beweglich! 👅" },
-            { cat: "Zunge", q: "Woraus besteht der weiße Belag auf der Zunge?", a: "Aus abgestorbenen <b>Zellen</b>, <b>Essensresten</b> und <b>Schleim</b>" },
-            { cat: "Zunge", q: "Nenne alle 5 Geschmacksrichtungen!", a: "1. Süß 🍬<br>2. Salzig 🧂<br>3. Sauer 🍋<br>4. Bitter ☕<br>5. Umami 🍜" },
-            { cat: "Zunge", q: "Kann die Zunge spüren, ob etwas hart, weich oder heiß ist?", a: "<b>Ja! ✅</b> Die Zunge kann auch Temperaturen fühlen." },
-            { cat: "Zunge", q: "Ist die Zunge mit dem Mundboden verbunden?", a: "<b>Ja! ✅</b>" },
-            { cat: "Zunge", q: "Haben Geschmackspapillen viele Nervenzellen?", a: "<b>Ja! ✅</b> Deshalb können wir so gut schmecken." },
-            { cat: "Zunge", q: "Wird die Zunge hellrosa, wenn man jeden Tag Zähne putzt?", a: "<b>Ja! ✅</b> Gute Mundhygiene = gesunde Zunge! 🪥" },
-            { cat: "Zunge", q: "Hat die Zunge 5 verschiedene Geschmäcke?", a: "<b>Ja! ✅</b> Süß, salzig, sauer, bitter und umami." },
-            { cat: "Zunge", q: "Liegt Umami hinter bitter auf der Zunge?", a: "<b>Nein! ❌</b> Umami liegt VOR bitter (weiter hinten auf der Zunge, aber nicht dahinter)." },
-            { cat: "Zunge", q: "Entsteht eine weiße Zunge durch Bakterien?", a: "<b>Nein! ❌</b> Sie entsteht durch abgestorbene Zellen, Essensreste und Schleim." },
+            { cat: "Zunge", q: "Was für eine Haut liegt auf der Zungenoberfläche?", a: "Eine spezielle <b>Schleimhaut</b>" },
+            { cat: "Zunge", q: "An welchem Teil im Mund ist die Zunge unten befestigt?", a: "Am <b>Mundboden</b>" },
+            { cat: "Zunge", q: "Warum kann sich die Zunge so gut in alle Richtungen bewegen?", a: "Weil sie aus vielen <b>Muskeln</b> besteht! 👅" },
+            { cat: "Zunge", q: "Manchmal hat die Zunge einen weißen Belag. Woraus besteht der?", a: "Aus abgestorbenen <b>Zellen</b>, <b>Essensresten</b> und <b>Schleim</b>" },
+            { cat: "Zunge", q: "Wie viele Geschmacksrichtungen gibt es? Zähle sie auf!", a: "5 Stück:<br>1. Süß 🍬<br>2. Salzig 🧂<br>3. Sauer 🍋<br>4. Bitter ☕<br>5. Umami 🍜" },
+            { cat: "Zunge", q: "Merkt die Zunge, ob etwas heiß, hart oder weich ist?", a: "<b>Ja! ✅</b> Die Zunge kann auch Temperaturen und Oberflächen fühlen." },
+            { cat: "Zunge", q: "Ist die Zunge am Mundboden festgemacht?", a: "<b>Ja! ✅</b>" },
+            { cat: "Zunge", q: "Sitzen in den Geschmackspapillen viele Nervenzellen?", a: "<b>Ja! ✅</b> Deshalb können wir so gut schmecken." },
+            { cat: "Zunge", q: "Wird die Zunge schön rosa, wenn man täglich die Zähne putzt?", a: "<b>Ja! ✅</b> Gute Mundhygiene = gesunde, rosa Zunge! 🪥" },
+            { cat: "Zunge", q: "Kann unsere Zunge genau 5 verschiedene Geschmäcke unterscheiden?", a: "<b>Ja! ✅</b> Süß, salzig, sauer, bitter und umami." },
+            { cat: "Zunge", q: "Stimmt das? Umami schmeckt man hinter dem bitteren Bereich auf der Zunge.", a: "<b>Nein! ❌</b> Umami liegt VOR bitter, nicht dahinter." },
+            { cat: "Zunge", q: "Stimmt das? Ein weißer Zungenbelag entsteht durch Bakterien.", a: "<b>Nein! ❌</b> Er entsteht durch abgestorbene Zellen, Essensreste und Schleim." },
 
             // === DAS GEHIRN ===
-            { cat: "Gehirn", q: "Nenne die 4 Hauptteile des Gehirns!<br><img src='" + IMG_GEHIRN + "'>", a: "1. <b>Großhirn</b><br>2. <b>Zwischenhirn</b><br>3. <b>Kleinhirn</b><br>4. <b>Hirnstamm</b>" },
-            { cat: "Gehirn", q: "Was ist das Gehirn für ein Organ?", a: "Ein sehr <b>komplexes</b> Organ – es steuert alles in unserem Körper! 🧠" },
-            { cat: "Gehirn", q: "Was kann ein hirntoter Mensch noch, wenn er an einer Maschine hängt?<br>a) zwinkern<br>b) atmen<br>c) gar nichts", a: "<b>b) atmen</b> – aber nur weil die Maschine hilft!" },
-            { cat: "Gehirn", q: "Ist das Rückenmark mit den Nerven vom Bein verbunden?", a: "<b>Ja! ✅</b> Das Rückenmark verbindet das Gehirn mit dem ganzen Körper." },
-            { cat: "Gehirn", q: "Was passiert mit dem Gehirn bei starker Kälte?", a: "Es wird <b>unaufmerksamer</b> und <b>langsamer</b> 🥶" },
-            { cat: "Gehirn", q: "Wovon berichten Menschen, die fast gestorben sind?", a: "Von einem <b>hellen Licht</b> und einem <b>Film vom Leben</b> (schöne Momente) ✨" },
-            { cat: "Gehirn", q: "Kann das Gehirn sofort lügen oder muss es das üben?", a: "Es muss das <b>Lügen erst üben</b> – es kann es nicht sofort!" },
-            { cat: "Gehirn", q: "Welches System im Gehirn ist für unsere Gefühle zuständig?", a: "Das <b>Limbische System</b> – es steuert Freude, Angst, Wut usw. 😊😢😡" },
-            { cat: "Gehirn", q: "Ist jede DNA gleich?", a: "<b>Nein! ❌</b> Jeder Mensch hat eine einzigartige DNA (außer eineiige Zwillinge)." },
-            { cat: "Gehirn", q: "Was macht der Hypothalamus?<br>a) Körpertemperatur kontrollieren<br>b) Neue Dinge lernen<br>c) Gedanken speichern", a: "<b>a) Körpertemperatur kontrollieren</b> 🌡️" },
+            { cat: "Gehirn", q: "Welche 4 Teile hat das Gehirn? Schau aufs Bild!<br><img src='gehirn.png'>", a: "1. <b>Großhirn</b><br>2. <b>Zwischenhirn</b><br>3. <b>Kleinhirn</b><br>4. <b>Hirnstamm</b>" },
+            { cat: "Gehirn", q: "Was für ein Organ ist das Gehirn – einfach oder komplex?", a: "Ein sehr <b>komplexes</b> Organ – es steuert alles in unserem Körper! 🧠" },
+            { cat: "Gehirn", q: "Ein hirntoter Mensch hängt an einer Maschine. Was kann er noch?<br>a) zwinkern<br>b) atmen<br>c) gar nichts", a: "<b>b) atmen</b> – aber nur weil die Maschine das für ihn macht!" },
+            { cat: "Gehirn", q: "Sind die Nerven im Bein mit dem Rückenmark verbunden?", a: "<b>Ja! ✅</b> Über das Rückenmark ist das Gehirn mit dem ganzen Körper verbunden." },
+            { cat: "Gehirn", q: "Wie reagiert das Gehirn, wenn es sehr kalt wird?", a: "Es wird <b>unaufmerksamer</b> und <b>langsamer</b> 🥶" },
+            { cat: "Gehirn", q: "Menschen, die fast gestorben sind, erzählen oft von zwei Dingen. Welchen?", a: "Von einem <b>hellen Licht</b> und einem <b>Film vom eigenen Leben</b> ✨" },
+            { cat: "Gehirn", q: "Kann unser Gehirn von Anfang an lügen oder muss es das erst lernen?", a: "Es muss das <b>Lügen erst üben</b> – es kann es nicht von Anfang an!" },
+            { cat: "Gehirn", q: "Wie heißt der Teil im Gehirn, der für Gefühle wie Freude und Angst zuständig ist?", a: "Das <b>Limbische System</b> 😊😢😡" },
+            { cat: "Gehirn", q: "Hat jeder Mensch die gleiche DNA?", a: "<b>Nein! ❌</b> Jeder Mensch hat eine einzigartige DNA (außer eineiige Zwillinge)." },
+            { cat: "Gehirn", q: "Wofür sorgt der Hypothalamus im Gehirn?<br>a) Körpertemperatur regeln<br>b) Neue Sachen lernen<br>c) Gedanken abspeichern", a: "<b>a) Körpertemperatur regeln</b> 🌡️" },
 
             // === DIE LUNGE ===
-            { cat: "Lunge", q: "Was ist die Hauptaufgabe der Lunge?", a: "Sie bringt <b>Sauerstoff</b> in unseren Körper – den brauchen wir zum Leben! 🫁" },
-            { cat: "Lunge", q: "Aus wie vielen Flügeln besteht die Lunge?", a: "Aus <b>zwei Lungenflügeln</b> – einem rechten und einem linken." },
-            { cat: "Lunge", q: "Was ist in beiden Lungenflügeln drin?", a: "Ein System aus <b>luftleitenden Wegen</b> (wie kleine Röhren für die Luft)." },
-            { cat: "Lunge", q: "Richtig oder Falsch:<br>Man braucht erst 5 Zigaretten, um die Lunge zu schaden.", a: "<b>Falsch! ❌</b> Schon EINE Zigarette schadet der Lunge! 🚭" },
-            { cat: "Lunge", q: "Richtig oder Falsch:<br>Eine Staublunge (Pneumokoniose) ist heilbar.", a: "<b>Falsch! ❌</b> Sie ist leider nicht heilbar." },
-            { cat: "Lunge", q: "Richtig oder Falsch:<br>Menschen mit Lungenödem müssen schnell ins Krankenhaus.", a: "<b>Richtig! ✅</b> Ein Lungenödem ist sehr gefährlich! 🏥" },
-            { cat: "Lunge", q: "Richtig oder Falsch:<br>Ein Lungenödem ist nicht gefährlich.", a: "<b>Falsch! ❌</b> Es ist sehr gefährlich!" },
-            { cat: "Lunge", q: "Nenne die 3 Teile auf dem Bild: Luftröhre, rechter Lungenflügel und...?", a: "1. <b>Luftröhre</b><br>2. <b>Rechter Lungenflügel</b><br>3. <b>Das Herz</b> ❤️" },
-            { cat: "Lunge", q: "Wie viele Lungenbläschen hat eine gesunde Lunge?", a: "Ungefähr <b>300 Millionen</b>! 🤯 Das sind super viele!" },
-            { cat: "Lunge", q: "Was bedeutet 'Pneumokoniose'?", a: "<b>Staublunge</b> – eine Krankheit durch zu viel Staub in der Lunge." },
-            { cat: "Lunge", q: "Welche Atmung hilft uns beim Sport, wenn wir uns anstrengen?", a: "Die <b>Mundatmung</b> – weil wir dann mehr Luft brauchen! 🏃" },
-            { cat: "Lunge", q: "Wie viele Lungenflügel hat ein Mensch?", a: "<b>Zwei!</b>" },
+            { cat: "Lunge", q: "Was bringt die Lunge in unseren Körper hinein?", a: "<b>Sauerstoff</b> – den brauchen wir zum Leben! 🫁" },
+            { cat: "Lunge", q: "Aus wie vielen Teilen (Flügeln) besteht die Lunge?", a: "Aus <b>zwei Lungenflügeln</b> – links und rechts." },
+            { cat: "Lunge", q: "Was zieht sich wie ein Röhrensystem durch beide Lungenflügel?", a: "Ein System aus <b>luftleitenden Wegen</b> (wie kleine Röhren für die Luft)." },
+            { cat: "Lunge", q: "Stimmt das? Erst ab 5 Zigaretten wird die Lunge geschädigt.", a: "<b>Falsch! ❌</b> Schon EINE einzige Zigarette schadet! 🚭" },
+            { cat: "Lunge", q: "Stimmt das? Eine Staublunge (Pneumokoniose) kann man wieder heilen.", a: "<b>Falsch! ❌</b> Sie ist leider nicht heilbar." },
+            { cat: "Lunge", q: "Stimmt das? Bei einem Lungenödem muss man sofort ins Krankenhaus.", a: "<b>Richtig! ✅</b> Ein Lungenödem ist lebensgefährlich! 🏥" },
+            { cat: "Lunge", q: "Stimmt das? Ein Lungenödem ist harmlos und nicht schlimm.", a: "<b>Falsch! ❌</b> Es ist sehr gefährlich!" },
+            { cat: "Lunge", q: "Welche 3 Dinge siehst du auf dem Lungenbild? (Luftröhre, ein Flügel und...?)", a: "1. <b>Luftröhre</b><br>2. <b>Rechter Lungenflügel</b><br>3. <b>Das Herz</b> ❤️" },
+            { cat: "Lunge", q: "Wie viele winzige Lungenbläschen hat eine gesunde Lunge ungefähr?", a: "Ungefähr <b>300 Millionen</b>! 🤯" },
+            { cat: "Lunge", q: "Was ist eine Pneumokoniose auf Deutsch?", a: "Eine <b>Staublunge</b> – entsteht durch zu viel eingeatmeten Staub." },
+            { cat: "Lunge", q: "Beim Sport atmen wir anders. Welche Atmung nutzen wir dann?", a: "Die <b>Mundatmung</b> – weil wir mehr Luft brauchen! 🏃" },
+            { cat: "Lunge", q: "Hat der Mensch einen oder zwei Lungenflügel?", a: "<b>Zwei!</b>" },
 
             // === DAS OHR ===
-            { cat: "Ohr", q: "Was ist der Vestibularapparat?", a: "Das <b>Gleichgewichtsorgan</b> – es hilft uns, Bewegungen zu erkennen und nicht umzufallen! ⚖️" },
-            { cat: "Ohr", q: "In welchen zwei Formen kann Ohrenschmalz vorkommen?", a: "Es kann <b>trocken</b> oder <b>feucht</b> sein." },
-            { cat: "Ohr", q: "Wie funktioniert das Hören? Beschreibe den Weg!", a: "Das <b>Ohr</b> nimmt Töne auf und verstärkt sie ➡️ Das <b>Gehirn</b> verarbeitet sie ➡️ Wir hören! 🎵" },
-            { cat: "Ohr", q: "Wann entsteht ein Druckgefühl im Ohr?", a: "Wenn der Luftdruck im <b>Mittelohr</b> nicht zum <b>Außendruck</b> passt und die <b>Ohrtrompete</b> den Druck nicht schnell genug ausgleicht." },
-            { cat: "Ohr", q: "Nenne die 3 Teile des Ohrs!", a: "1. <b>Außenohr</b><br>2. <b>Mittelohr</b><br>3. <b>Schnecke</b> (Innenohr) 🐌" },
-            { cat: "Ohr", q: "Kann Ohrenschmalz feucht und trocken sein?", a: "<b>Ja! ✅</b>" },
+            { cat: "Ohr", q: "Wie heißt das Gleichgewichtsorgan im Ohr mit Fachbegriff?", a: "<b>Vestibularapparat</b> – er hilft uns, Balance zu halten! ⚖️" },
+            { cat: "Ohr", q: "Ohrenschmalz gibt es in zwei Varianten. Welche?", a: "Es kann <b>trocken</b> oder <b>feucht</b> sein." },
+            { cat: "Ohr", q: "Beschreibe den Weg vom Ton bis zum Hören!", a: "<b>Ohr</b> nimmt Töne auf und verstärkt sie ➡️ <b>Gehirn</b> verarbeitet sie ➡️ Wir hören! 🎵" },
+            { cat: "Ohr", q: "Warum spürt man manchmal Druck auf den Ohren (z.B. im Flugzeug)?", a: "Weil der Luftdruck im <b>Mittelohr</b> nicht zum <b>Außendruck</b> passt und die <b>Ohrtrompete</b> den Ausgleich nicht schafft." },
+            { cat: "Ohr", q: "Aus welchen 3 Abschnitten besteht das Ohr?", a: "1. <b>Außenohr</b><br>2. <b>Mittelohr</b><br>3. <b>Schnecke</b> (Innenohr) 🐌" },
+            { cat: "Ohr", q: "Gibt es Ohrenschmalz in feuchter und trockener Form?", a: "<b>Ja! ✅</b>" },
 
             // === DAS ABWEHRSYSTEM ===
-            { cat: "Abwehrsystem", q: "Was macht das Abwehrsystem?<br>a) macht dich krank<br>b) schützt dich vor Bakterien<br>c) hilft beim Lernen", a: "<b>b) Es schützt dich vor Bakterien und Fremdstoffen! 🛡️</b>" },
-            { cat: "Abwehrsystem", q: "Warum bekommst du Fieber, wenn du krank bist?", a: "Weil deine <b>Zellen hart arbeiten</b>, um dich vor Bakterien zu schützen! 🌡️ Fieber ist ein Zeichen, dass dein Körper kämpft." },
-            { cat: "Abwehrsystem", q: "Was sind Leukozyten?", a: "<b>Weiße Blutzellen</b> (Weiße Blutkörperchen) – sie sind die Soldaten deines Körpers! 🪖" },
-            { cat: "Abwehrsystem", q: "Nenne 3 wichtige Wörter zum Thema Abwehrsystem!", a: "<b>Bakterien</b>, <b>Blutzellen</b>, <b>Infektion</b>, schützt, Abwehrsystem" },
+            { cat: "Abwehrsystem", q: "Welche Aufgabe hat das Abwehrsystem?<br>a) Es macht dich krank<br>b) Es schützt dich vor Keimen<br>c) Es hilft beim Lernen", a: "<b>b) Es schützt dich vor Bakterien und Fremdstoffen! 🛡️</b>" },
+            { cat: "Abwehrsystem", q: "Du bist krank und hast Fieber. Was bedeutet das für deinen Körper?", a: "Deine <b>Zellen arbeiten hart</b>, um die Bakterien zu bekämpfen! 🌡️ Fieber zeigt: Dein Körper kämpft!" },
+            { cat: "Abwehrsystem", q: "Leukozyten – was ist das für ein Wort? Was bedeutet es?", a: "<b>Weiße Blutzellen</b> (Weiße Blutkörperchen) – die Soldaten deines Körpers! 🪖" },
+            { cat: "Abwehrsystem", q: "Nenne 3 Begriffe, die zum Abwehrsystem gehören!", a: "<b>Bakterien</b>, <b>Blutzellen</b>, <b>Infektion</b>, schützt, Abwehrsystem" },
 
             // === DAS VERDAUUNGSSYSTEM ===
-            { cat: "Verdauung", q: "Was ist die 'Gekröse' und was macht sie?", a: "Sie <b>hält das Verdauungssystem zusammen</b>. Sie ist eine doppelte Falte des Bauchfells." },
-            { cat: "Verdauung", q: "In welchem Darm wird die Nahrung hauptsächlich verdaut?", a: "Im <b>Dünndarm</b>! Dort werden die Nährstoffe aufgenommen." },
-            { cat: "Verdauung", q: "In welche kleinen Bausteine wird die Nahrung zerlegt? Nenne 3!", a: "<b>Vitamine</b>, <b>Aminosäuren</b> und <b>Fettsäuren</b>" },
-            { cat: "Verdauung", q: "Richtig oder Falsch:<br>Im Dickdarm wird die Nahrung hauptsächlich verdaut.", a: "<b>Falsch! ❌</b> Das passiert im Dünndarm. Im Dickdarm wird vor allem Wasser entzogen." },
-            { cat: "Verdauung", q: "Richtig oder Falsch:<br>Die Speiseröhre leitet die Nahrung direkt in den Magen.", a: "<b>Richtig! ✅</b>" },
-            { cat: "Verdauung", q: "Richtig oder Falsch:<br>Die Gekröse hält das ganze Verdauungssystem zusammen.", a: "<b>Richtig! ✅</b>" },
-            { cat: "Verdauung", q: "Richtig oder Falsch:<br>Das Verdauungssystem besteht aus wenigen Organen.", a: "<b>Falsch! ❌</b> Es besteht aus VIELEN Organen!" },
-            { cat: "Verdauung", q: "Schau dir das Bild an! Was ist Nr. 1, 2, 3 und 4?<br><img src='" + IMG_VERDAUUNG + "'>", a: "1: <b>Speiseröhre</b><br>2: <b>Magen</b><br>3: <b>Leber</b><br>4: <b>Gallenblase</b>" },
-            { cat: "Verdauung", q: "Was liegt an Position 5, 6 und 10 im Verdauungssystem?<br><img src='" + IMG_VERDAUUNG + "'>", a: "5: <b>Bauchspeicheldrüse</b><br>6: <b>Dünndarm</b><br>10: <b>Anus</b> (Ausgang)" },
+            { cat: "Verdauung", q: "Was ist die Gekröse und welche Aufgabe hat sie?", a: "Sie <b>hält das Verdauungssystem zusammen</b>. Sie ist eine doppelte Falte des Bauchfells." },
+            { cat: "Verdauung", q: "In welchem Darmabschnitt werden die Nährstoffe aufgenommen?", a: "Im <b>Dünndarm</b>! Dort wird die Nahrung in kleine Teile zerlegt." },
+            { cat: "Verdauung", q: "Die Nahrung wird in winzige Bausteine zerlegt. Nenne 3 davon!", a: "<b>Vitamine</b>, <b>Aminosäuren</b> und <b>Fettsäuren</b>" },
+            { cat: "Verdauung", q: "Stimmt das? Die Hauptverdauung findet im Dickdarm statt.", a: "<b>Falsch! ❌</b> Die Hauptverdauung passiert im Dünndarm. Der Dickdarm entzieht vor allem Wasser." },
+            { cat: "Verdauung", q: "Stimmt das? Die Speiseröhre bringt das Essen direkt zum Magen.", a: "<b>Richtig! ✅</b>" },
+            { cat: "Verdauung", q: "Stimmt das? Die Gekröse hält alle Verdauungsorgane zusammen.", a: "<b>Richtig! ✅</b>" },
+            { cat: "Verdauung", q: "Stimmt das? Das Verdauungssystem hat nur wenige Organe.", a: "<b>Falsch! ❌</b> Es besteht aus VIELEN verschiedenen Organen!" },
+            { cat: "Verdauung", q: "Ordne zu: Was ist Nr. 1, 2, 3 und 4?<br><img src='verdauung.png'>", a: "1: <b>Speiseröhre</b><br>2: <b>Magen</b><br>3: <b>Leber</b><br>4: <b>Gallenblase</b>" },
+            { cat: "Verdauung", q: "Was liegt bei Nr. 5, 6 und 10?<br><img src='verdauung.png'>", a: "5: <b>Bauchspeicheldrüse</b><br>6: <b>Dünndarm</b><br>10: <b>Anus</b> (Ausgang)" },
 
             // === DAS HERZ ===
-            { cat: "Herz", q: "Richtig oder Falsch:<br>Das Herz hat 3 Kammern.", a: "<b>Falsch! ❌</b> Das Herz hat 4 Kammern (2 Vorhöfe + 2 Herzkammern)." },
-            { cat: "Herz", q: "Richtig oder Falsch:<br>Das Herz ist eines der wichtigsten Organe.", a: "<b>Richtig! ✅</b> Ohne Herz geht gar nichts! ❤️" },
-            { cat: "Herz", q: "Richtig oder Falsch:<br>Das Herz schlägt schneller bei Anstrengung.", a: "<b>Richtig! ✅</b> Beim Sport brauchen die Muskeln mehr Sauerstoff!" },
-            { cat: "Herz", q: "Wie groß ist das Herz ungefähr?<br>a) So groß wie ein Gehirn<br>b) So groß wie eine Faust<br>c) So groß wie ein Fuß", a: "<b>b) So groß wie eine Faust! ✊</b>" },
-            { cat: "Herz", q: "Warum schlägt das Herz bei Anstrengung schneller?", a: "Weil die <b>Muskeln mehr Stoffe</b> (und Sauerstoff) brauchen! 🏃‍♂️" },
+            { cat: "Herz", q: "Stimmt das? Unser Herz hat genau 3 Kammern.", a: "<b>Falsch! ❌</b> Es hat 4 Kammern (2 Vorhöfe + 2 Herzkammern)." },
+            { cat: "Herz", q: "Stimmt das? Das Herz gehört zu den wichtigsten Organen überhaupt.", a: "<b>Richtig! ✅</b> Ohne Herz geht gar nichts! ❤️" },
+            { cat: "Herz", q: "Stimmt das? Bei Sport und Anstrengung schlägt das Herz schneller.", a: "<b>Richtig! ✅</b> Die Muskeln brauchen dann mehr Sauerstoff!" },
+            { cat: "Herz", q: "Wie groß ist dein Herz etwa?<br>a) Wie ein Gehirn<br>b) Wie deine Faust<br>c) Wie dein Fuß", a: "<b>b) Wie deine Faust! ✊</b>" },
+            { cat: "Herz", q: "Warum muss das Herz bei Anstrengung schneller pumpen?", a: "Weil die <b>Muskeln mehr Sauerstoff und Nährstoffe</b> brauchen! 🏃‍♂️" },
 
             // === DAS AUGE ===
-            { cat: "Auge", q: "Richtig oder Falsch:<br>Die Augen bestehen aus Hornhaut, Sehnerv und sind mit dem Hirnstamm verbunden.", a: "<b>Richtig! ✅</b>" },
-            { cat: "Auge", q: "Durch welchen Teil kommt das Licht ins Auge?", a: "Durch die <b>Pupille</b> – das ist der schwarze Punkt in der Mitte! 👁️" },
-            { cat: "Auge", q: "Richtig oder Falsch:<br>Es gibt nur eine einzige Art von Blindheit.", a: "<b>Falsch! ❌</b> Es gibt verschiedene Arten von Blindheit." },
-            { cat: "Auge", q: "Ist es gut für die Augen, wenn man zu viel auf Bildschirme guckt?", a: "<b>Nein! ❌</b> Zu viel Bildschirmzeit ist schlecht für die Augen. 📱🚫" },
-            { cat: "Auge", q: "Haben Babys immer blaue Augen?", a: "<b>Nein! ❌</b> Nicht alle Babys haben blaue Augen." },
-            { cat: "Auge", q: "Was sehen Menschen mit einer Rot-Grün-Schwäche?", a: "Sie sehen Rot und Grün als <b>gleiche Farbe</b> (wie ein Khaki-Ton)." },
-            { cat: "Auge", q: "Nenne die wichtigsten Teile des Auges!<br><img src='" + IMG_AUGE + "'>", a: "1. <b>Hornhaut</b><br>2. <b>Pupille</b><br>3. <b>Iris</b><br>4. <b>Linse</b><br>5. <b>Netzhaut</b><br>6. <b>Sehnerv</b>" },
-            { cat: "Auge", q: "Was macht die Netzhaut?", a: "Sie nimmt das Licht auf und schickt <b>elektrische Signale</b> über den Sehnerv zum Gehirn! ⚡🧠" },
+            { cat: "Auge", q: "Stimmt das? Das Auge besteht unter anderem aus Hornhaut und Sehnerv.", a: "<b>Richtig! ✅</b>" },
+            { cat: "Auge", q: "Durch welche Öffnung gelangt Licht ins Auge hinein?", a: "Durch die <b>Pupille</b> – der schwarze Punkt in der Mitte! 👁️" },
+            { cat: "Auge", q: "Stimmt das? Es gibt nur eine Art von Blindheit.", a: "<b>Falsch! ❌</b> Es gibt verschiedene Arten von Blindheit." },
+            { cat: "Auge", q: "Stimmt das? Viel Bildschirmzeit ist gut für die Augen.", a: "<b>Falsch! ❌</b> Zu viel Bildschirmzeit schadet den Augen! 📱🚫" },
+            { cat: "Auge", q: "Stimmt das? Alle Babys kommen mit blauen Augen auf die Welt.", a: "<b>Falsch! ❌</b> Nicht alle Babys haben blaue Augen." },
+            { cat: "Auge", q: "Was passiert bei einer Rot-Grün-Schwäche? Was sieht man anders?", a: "Man sieht Rot und Grün als <b>gleiche Farbe</b> (wie ein Khaki-Ton)." },
+            { cat: "Auge", q: "Benenne die Teile des Auges!<br><img src='auge.png'>", a: "1. <b>Hornhaut</b><br>2. <b>Pupille</b><br>3. <b>Iris</b><br>4. <b>Linse</b><br>5. <b>Netzhaut</b><br>6. <b>Sehnerv</b>" },
+            { cat: "Auge", q: "Was ist die Aufgabe der Netzhaut im Auge?", a: "Sie fängt das Licht auf und schickt <b>elektrische Signale</b> über den Sehnerv ans Gehirn! ⚡🧠" },
         ];
 
         let currentCards = [...allCards];
@@ -386,7 +328,6 @@
                 document.getElementById('card-cat-front').innerText = card.cat;
                 document.getElementById('card-cat-back').innerText = "✅ Lösung";
                 document.getElementById('progress-text').innerText = (currentIndex + 1) + " / " + currentCards.length;
-
                 document.getElementById('prev-btn').disabled = currentIndex === 0;
                 document.getElementById('next-btn').disabled = currentIndex === currentCards.length - 1;
             }, cardEl.classList.contains('flipped') ? 250 : 0);
@@ -399,18 +340,12 @@
 
         function nextCard(event) {
             event.stopPropagation();
-            if (currentIndex < currentCards.length - 1) {
-                currentIndex++;
-                updateCard();
-            }
+            if (currentIndex < currentCards.length - 1) { currentIndex++; updateCard(); }
         }
 
         function prevCard(event) {
             event.stopPropagation();
-            if (currentIndex > 0) {
-                currentIndex--;
-                updateCard();
-            }
+            if (currentIndex > 0) { currentIndex--; updateCard(); }
         }
 
         function changeTopic() {
@@ -424,7 +359,6 @@
             updateCard();
         }
 
-        // App-Start
         updateCard();
     </script>
 </body>
