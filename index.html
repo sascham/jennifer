@@ -423,9 +423,9 @@
         </div>
 
         <div class="controls">
-            <button id="test-prev-btn" onclick="prevTestQ()">⬅️ Zurück</button>
+            <button id="test-prev-btn" onclick="prevTestQ()" style="visibility:hidden">⬅️ Zurück</button>
             <span class="progress" id="test-progress">0 / 0</span>
-            <button id="test-next-btn" onclick="nextTestQ()">Weiter ➡️</button>
+            <button id="test-next-btn" onclick="nextTestQ()" style="visibility:hidden">Weiter ➡️</button>
         </div>
     </div>
 
@@ -663,6 +663,8 @@
         let testCorrect = 0;
         let testWrong = 0;
         let testAnswered = 0;
+        let wrongQuestions = [];
+        let testRound = 1;
 
         function updateTestQuestion() {
             if (testQuestions.length === 0) {
@@ -671,9 +673,8 @@
                 return;
             }
             const q = testQuestions[testIndex];
-            // Show question with blank as underline
             document.getElementById('test-question').innerHTML = q.q.replace("___", "<span class='blank'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>");
-            document.getElementById('test-cat').innerText = q.cat;
+            document.getElementById('test-cat').innerText = q.cat + (testRound > 1 ? " (Runde " + testRound + ")" : "");
             document.getElementById('test-progress').innerText = (testIndex + 1) + " / " + testQuestions.length;
             document.getElementById('test-answer').value = "";
             document.getElementById('test-answer').className = "test-input";
@@ -693,7 +694,7 @@
             const correctAnswer = testQuestions[testIndex].answer;
 
             if (userAnswer === "") return;
-            if (input.disabled) return; // already answered
+            if (input.disabled) return;
 
             input.disabled = true;
 
@@ -702,73 +703,80 @@
                 feedback.innerHTML = "✅ Richtig! Super gemacht!";
                 feedback.className = "test-feedback correct";
                 testCorrect++;
-                testAnswered++;
-                updateTestScore();
-
-                // Show result if all answered
-                if (testAnswered === testQuestions.length) {
-                    setTimeout(showTestResult, 1200);
-                }
             } else {
                 input.className = "test-input wrong";
-                feedback.innerHTML = "❌ Falsch! Richtig wäre: <b>" + correctAnswer + "</b><br>Du musst von vorne anfangen!";
+                feedback.innerHTML = "❌ Falsch! Richtig wäre: <b>" + correctAnswer + "</b>";
                 feedback.className = "test-feedback wrong";
                 testWrong++;
-                testAnswered++;
-                updateTestScore();
-
-                // Restart after short delay
-                setTimeout(() => {
-                    shuffleArray(testQuestions);
-                    testIndex = 0;
-                    testCorrect = 0;
-                    testWrong = 0;
-                    testAnswered = 0;
-                    updateTestQuestion();
-                }, 2500);
+                wrongQuestions.push(testQuestions[testIndex]);
             }
+            testAnswered++;
+            updateTestScore();
+
+            // Auto-advance after 1.5s
+            setTimeout(() => {
+                if (testIndex < testQuestions.length - 1) {
+                    testIndex++;
+                    updateTestQuestion();
+                } else {
+                    // Round finished
+                    if (wrongQuestions.length > 0) {
+                        // Start new round with only wrong questions
+                        testRound++;
+                        testQuestions = [...wrongQuestions];
+                        shuffleArray(testQuestions);
+                        wrongQuestions = [];
+                        testIndex = 0;
+                        updateTestQuestion();
+                        document.getElementById('test-feedback').innerHTML = "🔄 Runde " + testRound + " – jetzt kommen die falschen Fragen nochmal!";
+                        document.getElementById('test-feedback').className = "test-feedback wrong";
+                    } else {
+                        // All correct! Show result
+                        showTestResult();
+                    }
+                }
+            }, 1500);
         }
 
         function updateTestScore() {
             document.getElementById('score-correct').innerText = testCorrect;
             document.getElementById('score-wrong').innerText = testWrong;
-            document.getElementById('score-remaining').innerText = (testQuestions.length - testAnswered);
+            document.getElementById('score-remaining').innerText = Math.max(0, testQuestions.length - (testIndex + 1));
         }
 
         function showTestResult() {
             document.getElementById('test-result').classList.remove('hidden');
-            const percent = Math.round((testCorrect / testQuestions.length) * 100);
             const scoreEl = document.getElementById('final-score');
-            scoreEl.innerText = percent + "%";
-
-            if (percent >= 80) {
-                scoreEl.className = "final-score good";
-                document.getElementById('final-message').innerText = "🌟 Mega! Du bist super vorbereitet!";
-            } else if (percent >= 50) {
-                scoreEl.className = "final-score ok";
-                document.getElementById('final-message').innerText = "👍 Gut, aber übe die falschen nochmal!";
-            } else {
-                scoreEl.className = "final-score bad";
-                document.getElementById('final-message').innerText = "💪 Nicht aufgeben! Lerne nochmal mit den Karteikarten.";
-            }
+            scoreEl.innerText = "100%";
+            scoreEl.className = "final-score good";
+            document.getElementById('final-message').innerText = "🌟 Alle richtig! Du hast es in " + testRound + (testRound === 1 ? " Runde" : " Runden") + " geschafft!";
         }
 
         function restartTest() {
+            const selectedTopic = document.getElementById('test-topic-select').value;
+            if (selectedTopic === 'alle') { testQuestions = [...allTestQuestions]; }
+            else { testQuestions = allTestQuestions.filter(q => q.cat === selectedTopic); }
             shuffleArray(testQuestions);
             testIndex = 0;
             testCorrect = 0;
             testWrong = 0;
+            testAnswered = 0;
+            wrongQuestions = [];
+            testRound = 1;
+            document.getElementById('test-result').classList.add('hidden');
+            updateTestQuestion();
+        }
             testAnswered = 0;
             document.getElementById('test-result').classList.add('hidden');
             updateTestQuestion();
         }
 
         function nextTestQ() {
-            if (testIndex < testQuestions.length - 1) { testIndex++; updateTestQuestion(); }
+            // disabled - auto-advance handles this
         }
 
         function prevTestQ() {
-            if (testIndex > 0) { testIndex--; updateTestQuestion(); }
+            // disabled - no going back in test mode
         }
 
         function shuffleArray(arr) {
@@ -788,6 +796,8 @@
             testCorrect = 0;
             testWrong = 0;
             testAnswered = 0;
+            wrongQuestions = [];
+            testRound = 1;
             document.getElementById('test-result').classList.add('hidden');
             updateTestQuestion();
         }
