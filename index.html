@@ -702,18 +702,29 @@
                 feedback.innerHTML = "✅ Richtig! Super gemacht!";
                 feedback.className = "test-feedback correct";
                 testCorrect++;
+                testAnswered++;
+                updateTestScore();
+
+                // Show result if all answered
+                if (testAnswered === testQuestions.length) {
+                    setTimeout(showTestResult, 1200);
+                }
             } else {
                 input.className = "test-input wrong";
-                feedback.innerHTML = "❌ Leider falsch! Richtig wäre: <b>" + correctAnswer + "</b>";
+                feedback.innerHTML = "❌ Falsch! Richtig wäre: <b>" + correctAnswer + "</b><br>Du musst von vorne anfangen!";
                 feedback.className = "test-feedback wrong";
                 testWrong++;
-            }
-            testAnswered++;
-            updateTestScore();
+                testAnswered++;
+                updateTestScore();
 
-            // Show result if all answered
-            if (testAnswered === testQuestions.length) {
-                setTimeout(showTestResult, 1200);
+                // Restart after short delay
+                setTimeout(() => {
+                    testIndex = 0;
+                    testCorrect = 0;
+                    testWrong = 0;
+                    testAnswered = 0;
+                    updateTestQuestion();
+                }, 2500);
             }
         }
 
