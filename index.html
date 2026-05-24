@@ -863,9 +863,18 @@
         function showTestResult() {
             document.getElementById('test-result').classList.remove('hidden');
             const scoreEl = document.getElementById('final-score');
-            scoreEl.innerText = "100%";
-            scoreEl.className = "final-score good";
-            document.getElementById('final-message').innerText = "🌟 Alle richtig! Du hast es in " + testRound + (testRound === 1 ? " Runde" : " Runden") + " geschafft!";
+
+            if (testRound === 1 && testWrong === 0) {
+                // All correct in one go!
+                scoreEl.innerText = "✨ Zauberhaft ✨";
+                scoreEl.className = "final-score good";
+                document.getElementById('final-message').innerText = "Alle richtig beim ersten Versuch! Du bist ein Star! 🌟";
+                showStreakReward(100); // big celebration
+            } else {
+                scoreEl.innerText = "100%";
+                scoreEl.className = "final-score good";
+                document.getElementById('final-message').innerText = "🌟 Alle richtig! Du hast es in " + testRound + (testRound === 1 ? " Runde" : " Runden") + " geschafft!";
+            }
             saveToScoreboard();
         }
 
