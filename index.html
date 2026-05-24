@@ -429,6 +429,78 @@
         }
 
         .hidden { display: none !important; }
+
+        /* Letter Box Practice */
+        .letter-practice {
+            margin-top: 15px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .letter-practice.active { display: flex; }
+
+        .letter-practice-label {
+            font-size: 0.85rem;
+            color: #636e72;
+            font-weight: 600;
+        }
+
+        .letter-boxes {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .letter-box {
+            width: 32px;
+            height: 38px;
+            border: 2px solid #dfe6e9;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            outline: none;
+            text-transform: none;
+            transition: border-color 0.2s;
+        }
+
+        .letter-box:focus { border-color: var(--primary); }
+        .letter-box.correct { border-color: var(--correct); background: #d4edda; }
+        .letter-box.wrong { border-color: var(--wrong); background: #ffeaea; }
+
+        .letter-hint {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .letter-hint-char {
+            width: 32px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--correct);
+            background: #f0fff4;
+            border-radius: 4px;
+        }
+
+        .letter-practice-btn {
+            padding: 10px 20px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -523,6 +595,12 @@
                 <button class="test-check-btn" onclick="checkTestAnswer()">Prüfen ✓</button>
             </div>
             <div class="test-feedback" id="test-feedback"></div>
+            <div class="letter-practice" id="letter-practice">
+                <div class="letter-practice-label">Schreibe das Wort Buchstabe für Buchstabe:</div>
+                <div class="letter-boxes" id="letter-boxes"></div>
+                <div class="letter-hint" id="letter-hint"></div>
+                <button class="letter-practice-btn" onclick="checkLetterPractice()">Prüfen ✓</button>
+            </div>
         </div>
 
         <div class="controls">
@@ -841,6 +919,7 @@
             document.getElementById('test-feedback').className = "test-feedback";
             document.getElementById('test-answer').disabled = false;
             document.getElementById('test-answer').focus();
+            document.getElementById('letter-practice').classList.remove('active');
             document.getElementById('test-prev-btn').disabled = testIndex === 0;
             document.getElementById('test-next-btn').disabled = testIndex === testQuestions.length - 1;
             updateTestScore();
@@ -876,32 +955,15 @@
                 wrongQuestions.push(testQuestions[testIndex]);
                 streak = 0;
                 playWrongSound();
+                showLetterPractice(correctAnswer);
+                return; // Don't auto-advance, wait for letter practice
             }
             testAnswered++;
             updateTestScore();
 
-            // Auto-advance after 1.5s
+            // Auto-advance after correct answer
             setTimeout(() => {
-                if (testIndex < testQuestions.length - 1) {
-                    testIndex++;
-                    updateTestQuestion();
-                } else {
-                    // Round finished
-                    if (wrongQuestions.length > 0) {
-                        // Start new round with only wrong questions
-                        testRound++;
-                        testQuestions = [...wrongQuestions];
-                        shuffleArray(testQuestions);
-                        wrongQuestions = [];
-                        testIndex = 0;
-                        updateTestQuestion();
-                        document.getElementById('test-feedback').innerHTML = "🔄 Runde " + testRound + " – jetzt kommen die falschen Fragen nochmal!";
-                        document.getElementById('test-feedback').className = "test-feedback wrong";
-                    } else {
-                        // All correct! Show result
-                        showTestResult();
-                    }
-                }
+                advanceAfterAnswer();
             }, 1500);
         }
 
@@ -927,6 +989,113 @@
                 document.getElementById('final-message').innerText = "🌟 Alle richtig! Du hast es in " + testRound + (testRound === 1 ? " Runde" : " Runden") + " geschafft!";
             }
             saveToScoreboard();
+        }
+
+        // ===== LETTER PRACTICE (after wrong answer) =====
+        function showLetterPractice(word) {
+            const container = document.getElementById('letter-practice');
+            const boxesDiv = document.getElementById('letter-boxes');
+            const hintDiv = document.getElementById('letter-hint');
+
+            // Create letter input boxes
+            boxesDiv.innerHTML = '';
+            for (let i = 0; i < word.length; i++) {
+                const box = document.createElement('input');
+                box.type = 'text';
+                box.maxLength = 1;
+                box.className = 'letter-box';
+                box.setAttribute('autocorrect', 'off');
+                box.setAttribute('autocapitalize', 'off');
+                box.setAttribute('spellcheck', 'false');
+                box.dataset.index = i;
+                box.addEventListener('input', function() {
+                    // Auto-advance to next box
+                    if (this.value.length === 1 && i < word.length - 1) {
+                        boxesDiv.children[i + 1].focus();
+                    }
+                });
+                box.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && this.value === '' && i > 0) {
+                        boxesDiv.children[i - 1].focus();
+                    }
+                    if (e.key === 'Enter') {
+                        checkLetterPractice();
+                    }
+                });
+                boxesDiv.appendChild(box);
+            }
+
+            // Show correct letters as hint below
+            hintDiv.innerHTML = '';
+            for (let i = 0; i < word.length; i++) {
+                const span = document.createElement('span');
+                span.className = 'letter-hint-char';
+                span.innerText = word[i];
+                hintDiv.appendChild(span);
+            }
+
+            container.classList.add('active');
+            boxesDiv.children[0].focus();
+        }
+
+        function checkLetterPractice() {
+            const word = testQuestions[testIndex].answer;
+            const boxesDiv = document.getElementById('letter-boxes');
+            const boxes = boxesDiv.querySelectorAll('.letter-box');
+            let allCorrect = true;
+
+            boxes.forEach((box, i) => {
+                if (box.value === word[i]) {
+                    box.className = 'letter-box correct';
+                } else {
+                    box.className = 'letter-box wrong';
+                    allCorrect = false;
+                }
+            });
+
+            if (allCorrect) {
+                playCorrectSound();
+                // Hide letter practice and advance
+                setTimeout(() => {
+                    document.getElementById('letter-practice').classList.remove('active');
+                    advanceAfterAnswer();
+                }, 800);
+            } else {
+                playWrongSound();
+                // Clear wrong boxes and try again
+                setTimeout(() => {
+                    boxes.forEach((box, i) => {
+                        if (box.value !== word[i]) {
+                            box.value = '';
+                            box.className = 'letter-box';
+                        }
+                    });
+                    // Focus first empty box
+                    for (let b of boxes) {
+                        if (b.value === '') { b.focus(); break; }
+                    }
+                }, 600);
+            }
+        }
+
+        function advanceAfterAnswer() {
+            if (testIndex < testQuestions.length - 1) {
+                testIndex++;
+                updateTestQuestion();
+            } else {
+                if (wrongQuestions.length > 0) {
+                    testRound++;
+                    testQuestions = [...wrongQuestions];
+                    shuffleArray(testQuestions);
+                    wrongQuestions = [];
+                    testIndex = 0;
+                    updateTestQuestion();
+                    document.getElementById('test-feedback').innerHTML = "🔄 Runde " + testRound + " – jetzt kommen die falschen Fragen nochmal!";
+                    document.getElementById('test-feedback').className = "test-feedback wrong";
+                } else {
+                    showTestResult();
+                }
+            }
         }
 
         // ===== STREAK REWARDS =====
