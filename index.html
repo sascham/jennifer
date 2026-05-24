@@ -373,6 +373,61 @@
             padding: 10px;
         }
 
+        /* Streak Reward Animation */
+        .streak-reward {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            pointer-events: none;
+            animation: fadeOut 2.5s forwards;
+        }
+
+        .streak-reward .emoji-burst {
+            font-size: 4rem;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+        }
+
+        .streak-reward .streak-text {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            0%, 70% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .confetti {
+            position: fixed;
+            top: -10px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            z-index: 9998;
+            animation: confettiFall 2s forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
         .hidden { display: none !important; }
     </style>
 </head>
@@ -720,6 +775,7 @@
         let testAnswered = 0;
         let wrongQuestions = [];
         let testRound = 1;
+        let streak = 0;
 
         function updateTestQuestion() {
             if (testQuestions.length === 0) {
@@ -758,12 +814,17 @@
                 feedback.innerHTML = "✅ Richtig! Super gemacht!";
                 feedback.className = "test-feedback correct";
                 testCorrect++;
+                streak++;
+                if (streak > 0 && streak % 5 === 0) {
+                    showStreakReward(streak);
+                }
             } else {
                 input.className = "test-input wrong";
                 feedback.innerHTML = "❌ Falsch! Richtig wäre: <b>" + correctAnswer + "</b>";
                 feedback.className = "test-feedback wrong";
                 testWrong++;
                 wrongQuestions.push(testQuestions[testIndex]);
+                streak = 0;
             }
             testAnswered++;
             updateTestScore();
@@ -806,6 +867,42 @@
             scoreEl.className = "final-score good";
             document.getElementById('final-message').innerText = "🌟 Alle richtig! Du hast es in " + testRound + (testRound === 1 ? " Runde" : " Runden") + " geschafft!";
             saveToScoreboard();
+        }
+
+        // ===== STREAK REWARDS =====
+        const streakRewards = [
+            { at: 5, emoji: "⭐", text: "5er Serie! Weiter so!" },
+            { at: 10, emoji: "🔥", text: "10er Serie! Du bist on fire!" },
+            { at: 15, emoji: "🚀", text: "15er Serie! Unaufhaltbar!" },
+            { at: 20, emoji: "👑", text: "20er Serie! Königin!" },
+            { at: 25, emoji: "💎", text: "25er Serie! Diamant-Status!" },
+            { at: 30, emoji: "🦄", text: "30er Serie! Einhorn-Level!" },
+        ];
+
+        function showStreakReward(currentStreak) {
+            const reward = streakRewards.find(r => r.at === currentStreak) || { emoji: "🌟", text: currentStreak + "er Serie!" };
+
+            // Create reward popup
+            const div = document.createElement('div');
+            div.className = 'streak-reward';
+            div.innerHTML = '<div><div class="emoji-burst">' + reward.emoji + '</div><div class="streak-text">' + reward.text + '</div></div>';
+            document.body.appendChild(div);
+
+            // Confetti
+            const colors = ['#6c5ce7', '#00b894', '#fdcb6e', '#e17055', '#74b9ff', '#fd79a8'];
+            for (let i = 0; i < 20; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                confetti.style.width = (Math.random() * 8 + 6) + 'px';
+                confetti.style.height = confetti.style.width;
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 2500);
+            }
+
+            setTimeout(() => div.remove(), 2500);
         }
 
         // ===== SCOREBOARD (localStorage) =====
@@ -860,6 +957,7 @@
             testAnswered = 0;
             wrongQuestions = [];
             testRound = 1;
+            streak = 0;
             document.getElementById('test-result').classList.add('hidden');
             updateTestQuestion();
         }
@@ -891,6 +989,7 @@
             testAnswered = 0;
             wrongQuestions = [];
             testRound = 1;
+            streak = 0;
             document.getElementById('test-result').classList.add('hidden');
             updateTestQuestion();
         }
