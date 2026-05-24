@@ -325,6 +325,54 @@
             cursor: pointer;
         }
 
+        .scoreboard {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-top: 20px;
+            width: 100%;
+            max-width: 550px;
+        }
+
+        .scoreboard h3 {
+            margin: 0 0 10px 0;
+            font-size: 0.95rem;
+            color: var(--primary);
+            text-align: center;
+        }
+
+        .scoreboard-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .scoreboard-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.85rem;
+        }
+
+        .scoreboard-list li:last-child { border-bottom: none; }
+
+        .sb-date { color: #636e72; }
+        .sb-topic { font-weight: 600; }
+        .sb-rounds { color: var(--primary); font-weight: 700; }
+        .sb-result { font-weight: 700; }
+        .sb-result.good { color: var(--correct); }
+        .sb-result.ok { color: #fdcb6e; }
+
+        .scoreboard-empty {
+            text-align: center;
+            color: #b2bec3;
+            font-style: italic;
+            padding: 10px;
+        }
+
         .hidden { display: none !important; }
     </style>
 </head>
@@ -426,6 +474,13 @@
             <button id="test-prev-btn" onclick="prevTestQ()" style="visibility:hidden">⬅️ Zurück</button>
             <span class="progress" id="test-progress">0 / 0</span>
             <button id="test-next-btn" onclick="nextTestQ()" style="visibility:hidden">Weiter ➡️</button>
+        </div>
+
+        <div class="scoreboard" id="scoreboard">
+            <h3>🏆 Letzte 5 Ergebnisse</h3>
+            <ul class="scoreboard-list" id="scoreboard-list">
+                <li class="scoreboard-empty">Noch keine Ergebnisse</li>
+            </ul>
         </div>
     </div>
 
@@ -750,6 +805,48 @@
             scoreEl.innerText = "100%";
             scoreEl.className = "final-score good";
             document.getElementById('final-message').innerText = "🌟 Alle richtig! Du hast es in " + testRound + (testRound === 1 ? " Runde" : " Runden") + " geschafft!";
+            saveToScoreboard();
+        }
+
+        // ===== SCOREBOARD (localStorage) =====
+        function saveToScoreboard() {
+            const topic = document.getElementById('test-topic-select').value;
+            const topicLabel = topic === 'alle' ? 'Alle Themen' : topic;
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+
+            const entry = {
+                date: dateStr,
+                topic: topicLabel,
+                rounds: testRound,
+                correct: testCorrect,
+                wrong: testWrong
+            };
+
+            let history = JSON.parse(localStorage.getItem('bioQuizScoreboard') || '[]');
+            history.unshift(entry);
+            if (history.length > 5) history = history.slice(0, 5);
+            localStorage.setItem('bioQuizScoreboard', JSON.stringify(history));
+            renderScoreboard();
+        }
+
+        function renderScoreboard() {
+            const history = JSON.parse(localStorage.getItem('bioQuizScoreboard') || '[]');
+            const list = document.getElementById('scoreboard-list');
+
+            if (history.length === 0) {
+                list.innerHTML = '<li class="scoreboard-empty">Noch keine Ergebnisse</li>';
+                return;
+            }
+
+            list.innerHTML = history.map(entry => {
+                const roundClass = entry.rounds === 1 ? 'good' : 'ok';
+                return '<li>' +
+                    '<span class="sb-date">' + entry.date + '</span>' +
+                    '<span class="sb-topic">' + entry.topic + '</span>' +
+                    '<span class="sb-rounds ' + roundClass + '">' + entry.rounds + (entry.rounds === 1 ? ' Runde' : ' Runden') + '</span>' +
+                    '</li>';
+            }).join('');
         }
 
         function restartTest() {
@@ -822,6 +919,7 @@
 
         // App-Start
         updateCard();
+        renderScoreboard();
     </script>
 </body>
 </html>
