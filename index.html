@@ -540,6 +540,54 @@
     </div>
 
     <script>
+        // ===== SOUND EFFECTS (Web Audio API) =====
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playCorrectSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523, audioCtx.currentTime); // C5
+            osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.1); // E5
+            osc.frequency.setValueAtTime(784, audioCtx.currentTime + 0.2); // G5
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.4);
+        }
+
+        function playWrongSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function playStreakSound() {
+            const notes = [523, 659, 784, 1047]; // C5 E5 G5 C6
+            notes.forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.12);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime + i * 0.12);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.12 + 0.3);
+                osc.start(audioCtx.currentTime + i * 0.12);
+                osc.stop(audioCtx.currentTime + i * 0.12 + 0.3);
+            });
+        }
+
         // ===== KARTEIKARTEN-DATEN =====
         const allCards = [
             // === BEWEGUNGSAPPARAT ===
@@ -815,8 +863,10 @@
                 feedback.className = "test-feedback correct";
                 testCorrect++;
                 streak++;
+                playCorrectSound();
                 if (streak > 0 && streak % 5 === 0) {
                     showStreakReward(streak);
+                    playStreakSound();
                 }
             } else {
                 input.className = "test-input wrong";
@@ -825,6 +875,7 @@
                 testWrong++;
                 wrongQuestions.push(testQuestions[testIndex]);
                 streak = 0;
+                playWrongSound();
             }
             testAnswered++;
             updateTestScore();
@@ -1028,6 +1079,11 @@
         // App-Start
         updateCard();
         renderScoreboard();
+        // Resume audio on first tap (required for iOS)
+        document.addEventListener('click', function resumeAudio() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            document.removeEventListener('click', resumeAudio);
+        });
     </script>
 </body>
 </html>
