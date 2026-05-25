@@ -577,6 +577,55 @@
         .island-info p { margin: 5px 0; color: #636e72; font-size: 0.9rem; }
         .island-info .progress-count { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
 
+        /* Badges */
+        .badge-section { display: none; width: 100%; max-width: 550px; flex-direction: column; align-items: center; }
+        .badge-section.active { display: flex; }
+
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .badge-card {
+            background: white;
+            border-radius: 14px;
+            padding: 15px 10px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            border: 3px solid #dfe6e9;
+        }
+
+        .badge-card.earned {
+            border-color: #fdcb6e;
+            background: linear-gradient(135deg, #fff9e6, #ffffff);
+            box-shadow: 0 4px 15px rgba(253,203,110,0.3);
+        }
+
+        .badge-card.locked {
+            opacity: 0.5;
+            filter: grayscale(0.8);
+        }
+
+        .badge-emoji { font-size: 2rem; margin-bottom: 5px; }
+        .badge-name { font-size: 0.7rem; font-weight: 700; color: var(--text); line-height: 1.2; }
+        .badge-desc { font-size: 0.6rem; color: #636e72; margin-top: 3px; line-height: 1.2; }
+
+        .badge-summary {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .badge-summary .progress-count { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
+        .badge-summary p { margin: 5px 0; color: #636e72; font-size: 0.9rem; }
+
         .hidden { display: none !important; }
 
         /* Letter Box Practice */
@@ -660,9 +709,10 @@
 
     <!-- Tab Navigation -->
     <div class="tab-nav">
-        <button class="tab-btn active" onclick="switchTab('flashcards')">📇 Karteikarten</button>
-        <button class="tab-btn" onclick="switchTab('test')">✍️ Schriftlicher Test</button>
-        <button class="tab-btn" onclick="switchTab('islands')">🗺️ Inselkarte</button>
+        <button class="tab-btn active" onclick="switchTab('flashcards')">📇 Karten</button>
+        <button class="tab-btn" onclick="switchTab('test')">✍️ Test</button>
+        <button class="tab-btn" onclick="switchTab('islands')">🗺️ Inseln</button>
+        <button class="tab-btn" onclick="switchTab('badges')">🏅 Abzeichen</button>
     </div>
 
     <!-- FLASHCARD SECTION -->
@@ -777,6 +827,15 @@
             <p class="progress-count" id="island-progress">0 / 10</p>
             <p>Themen freigeschaltet</p>
             <p style="font-size:0.8rem; margin-top:8px;">Schaffe ein Thema im schriftlichen Test ohne Fehler, um die Insel freizuschalten! 🏝️</p>
+        </div>
+    </div>
+
+    <!-- BADGE SECTION -->
+    <div id="badge-section" class="badge-section">
+        <div class="badge-grid" id="badge-grid"></div>
+        <div class="badge-summary">
+            <p class="progress-count" id="badge-progress">0 / 12</p>
+            <p>Abzeichen gesammelt</p>
         </div>
     </div>
 
@@ -1119,6 +1178,9 @@
                 if (streak > 0 && streak % 5 === 0) {
                     showStreakReward(streak);
                     playStreakSound();
+                    if (streak >= 5) earnBadge('streak-5');
+                    if (streak >= 10) earnBadge('streak-10');
+                    if (streak >= 20) earnBadge('streak-20');
                 }
             } else {
                 input.className = "test-input wrong";
@@ -1161,7 +1223,8 @@
                 scoreEl.innerText = "✨ Zauberhaft ✨";
                 scoreEl.className = "final-score good";
                 document.getElementById('final-message').innerText = "Alle richtig beim ersten Versuch! Du bist ein Star! 🌟";
-                showStreakReward(100); // big celebration
+                showStreakReward(100);
+                earnBadge('zauberhaft');
             } else {
                 scoreEl.innerText = "100%";
                 scoreEl.className = "final-score good";
@@ -1413,6 +1476,8 @@
             document.getElementById('test-section').style.display = 'none';
             document.getElementById('island-section').classList.remove('active');
             document.getElementById('island-section').style.display = 'none';
+            document.getElementById('badge-section').classList.remove('active');
+            document.getElementById('badge-section').style.display = 'none';
 
             if (tab === 'flashcards') {
                 tabs[0].classList.add('active');
@@ -1429,6 +1494,11 @@
                 document.getElementById('island-section').classList.add('active');
                 document.getElementById('island-section').style.display = 'flex';
                 renderIslandMap();
+            } else if (tab === 'badges') {
+                tabs[3].classList.add('active');
+                document.getElementById('badge-section').classList.add('active');
+                document.getElementById('badge-section').style.display = 'flex';
+                renderBadges();
             }
         }
 
@@ -1491,6 +1561,73 @@
             path.appendChild(treasure);
 
             document.getElementById('island-progress').innerText = unlocked.length + ' / 10';
+        }
+
+        // ===== BADGES =====
+        const allBadges = [
+            { id: "first-test", emoji: "🎯", name: "Erster Test", desc: "Ersten schriftlichen Test abgeschlossen" },
+            { id: "streak-5", emoji: "⭐", name: "5er Serie", desc: "5 richtige Antworten in Folge" },
+            { id: "streak-10", emoji: "🔥", name: "Feuersträhne", desc: "10 richtige in Folge" },
+            { id: "streak-20", emoji: "👑", name: "Königin", desc: "20 richtige in Folge" },
+            { id: "no-hints", emoji: "🧠", name: "Ohne Hilfe", desc: "Ein Thema ohne Tipp geschafft" },
+            { id: "zauberhaft", emoji: "✨", name: "Zauberhaft", desc: "Alle Fragen beim ersten Versuch richtig" },
+            { id: "island-3", emoji: "🏝️", name: "Entdeckerin", desc: "3 Inseln freigeschaltet" },
+            { id: "island-5", emoji: "🌊", name: "Seefahrerin", desc: "5 Inseln freigeschaltet" },
+            { id: "island-10", emoji: "🏆", name: "Insel-Meisterin", desc: "Alle 10 Inseln freigeschaltet" },
+            { id: "speed-demon", emoji: "⚡", name: "Blitzschnell", desc: "Alle Fragen eines Themas in unter 60 Sek." },
+            { id: "persistent", emoji: "💪", name: "Durchhalterin", desc: "5 Tests insgesamt abgeschlossen" },
+            { id: "perfectionist", emoji: "💎", name: "Perfektionistin", desc: "3 Themen ohne Fehler geschafft" },
+        ];
+
+        function getEarnedBadges() {
+            return JSON.parse(localStorage.getItem('bioQuizBadges') || '[]');
+        }
+
+        function earnBadge(badgeId) {
+            let earned = getEarnedBadges();
+            if (!earned.includes(badgeId)) {
+                earned.push(badgeId);
+                localStorage.setItem('bioQuizBadges', JSON.stringify(earned));
+            }
+        }
+
+        function checkBadges() {
+            const unlocked = getUnlockedIslands();
+            const history = JSON.parse(localStorage.getItem('bioQuizScoreboard') || '[]');
+            const earned = getEarnedBadges();
+
+            // First test completed
+            if (history.length >= 1) earnBadge('first-test');
+
+            // Island milestones
+            if (unlocked.length >= 3) earnBadge('island-3');
+            if (unlocked.length >= 5) earnBadge('island-5');
+            if (unlocked.length >= 10) earnBadge('island-10');
+
+            // Persistent (5 tests done)
+            if (history.length >= 5) earnBadge('persistent');
+
+            // Perfectionist (3 topics without error)
+            if (unlocked.length >= 3) earnBadge('perfectionist');
+        }
+
+        function renderBadges() {
+            checkBadges();
+            const earned = getEarnedBadges();
+            const grid = document.getElementById('badge-grid');
+            grid.innerHTML = '';
+
+            allBadges.forEach(badge => {
+                const isEarned = earned.includes(badge.id);
+                const card = document.createElement('div');
+                card.className = 'badge-card ' + (isEarned ? 'earned' : 'locked');
+                card.innerHTML = '<div class="badge-emoji">' + badge.emoji + '</div>' +
+                    '<div class="badge-name">' + badge.name + '</div>' +
+                    '<div class="badge-desc">' + (isEarned ? badge.desc : '???') + '</div>';
+                grid.appendChild(card);
+            });
+
+            document.getElementById('badge-progress').innerText = earned.length + ' / ' + allBadges.length;
         }
 
         // App-Start
