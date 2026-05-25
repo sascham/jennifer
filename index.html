@@ -251,6 +251,23 @@
             cursor: pointer;
         }
 
+        .test-hint-btn {
+            padding: 12px 18px;
+            font-size: 14px;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            background: #fdcb6e;
+            color: #2d3436;
+            cursor: pointer;
+        }
+
+        .test-hint-btn:disabled {
+            background: #dfe6e9;
+            color: #b2bec3;
+            cursor: not-allowed;
+        }
+
         .test-feedback {
             margin-top: 15px;
             font-size: 1rem;
@@ -592,6 +609,7 @@
             <div class="test-question" id="test-question">Frage lädt...</div>
             <div class="test-input-row">
                 <input type="search" class="test-input" id="test-answer" placeholder="Deine Antwort..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" onkeydown="if(event.key==='Enter')checkTestAnswer()">
+                <button class="test-hint-btn" id="test-hint-btn" onclick="showHint()">💡 Tipp</button>
                 <button class="test-check-btn" onclick="checkTestAnswer()">Prüfen ✓</button>
             </div>
             <div class="test-feedback" id="test-feedback"></div>
@@ -779,70 +797,70 @@
         // ===== SCHRIFTLICHER TEST – Lückentexte (1 Wort, exakte Schreibweise!) =====
         const allTestQuestions = [
             // BEWEGUNGSAPPARAT
-            { cat: "Bewegungsapparat", q: "Der Oberschenkelknochen heißt auf Latein ___.", answer: "Femur" },
-            { cat: "Bewegungsapparat", q: "Das Schienbein heißt auf Latein ___.", answer: "Tibia" },
-            { cat: "Bewegungsapparat", q: "Der Knochen zwischen Wirbelsäule und Beinen heißt ___.", answer: "Becken" },
-            { cat: "Bewegungsapparat", q: "Der Unterarmknochen, der wie ein Fahrradteil heißt: ___.", answer: "Speiche" },
-            { cat: "Bewegungsapparat", q: "Sie besteht aus vielen Wirbeln und gibt uns Haltung: die ___.", answer: "Wirbelsäule" },
-            { cat: "Bewegungsapparat", q: "Der Knochenkäfig um Herz und Lunge heißt ___.", answer: "Brustkorb" },
-            { cat: "Bewegungsapparat", q: "Das gesamte Knochengerüst des Menschen nennt man ___.", answer: "Skelett" },
+            { cat: "Bewegungsapparat", q: "Wie nennt man den langen Knochen im Oberschenkel? ___", answer: "Femur" },
+            { cat: "Bewegungsapparat", q: "Der vordere Knochen am Unterschenkel heißt ___.", answer: "Tibia" },
+            { cat: "Bewegungsapparat", q: "Zwischen den Beinen und der Wirbelsäule liegt das ___.", answer: "Becken" },
+            { cat: "Bewegungsapparat", q: "Ein Knochen im Unterarm trägt den gleichen Namen wie ein Fahrradteil: ___.", answer: "Speiche" },
+            { cat: "Bewegungsapparat", q: "Unser Rückgrat aus vielen einzelnen Wirbeln heißt ___.", answer: "Wirbelsäule" },
+            { cat: "Bewegungsapparat", q: "Die Rippen formen einen schützenden Käfig – den ___.", answer: "Brustkorb" },
+            { cat: "Bewegungsapparat", q: "Alle Knochen zusammen bilden das ___.", answer: "Skelett" },
 
             // NASE
-            { cat: "Nase", q: "Die ___ in der Nase fangen Bakterien und Schmutz ab.", answer: "Nasenhaare" },
-            { cat: "Nase", q: "Die ___ in der Nase produziert Schleim gegen Bakterien.", answer: "Schleimhaut" },
-            { cat: "Nase", q: "Wenn man sich an der Nase stößt, kann man ___ bekommen.", answer: "Nasenbluten" },
+            { cat: "Nase", q: "Kleine Härchen in der Nase filtern Dreck – man nennt sie ___.", answer: "Nasenhaare" },
+            { cat: "Nase", q: "Die feuchte Haut in der Nase, die Schleim bildet, heißt ___.", answer: "Schleimhaut" },
+            { cat: "Nase", q: "Bei einem Stoß auf die Nase kann ___ entstehen.", answer: "Nasenbluten" },
 
             // ZUNGE
-            { cat: "Zunge", q: "Die Zungenoberfläche ist mit einer speziellen ___ bedeckt.", answer: "Schleimhaut" },
-            { cat: "Zunge", q: "Die Zunge ist unten am ___ befestigt.", answer: "Mundboden" },
-            { cat: "Zunge", q: "Die Zunge kann sich so gut bewegen, weil sie aus ___ besteht.", answer: "Muskeln" },
-            { cat: "Zunge", q: "Der fünfte Geschmack neben süß, salzig, sauer und bitter heißt ___.", answer: "Umami" },
+            { cat: "Zunge", q: "Die Oberfläche der Zunge ist von einer besonderen ___ überzogen.", answer: "Schleimhaut" },
+            { cat: "Zunge", q: "Unten ist die Zunge fest mit dem ___ verbunden.", answer: "Mundboden" },
+            { cat: "Zunge", q: "Weil die Zunge aus vielen ___ besteht, ist sie so beweglich.", answer: "Muskeln" },
+            { cat: "Zunge", q: "Neben süß, salzig, sauer und bitter gibt es noch den Geschmack ___.", answer: "Umami" },
 
             // GEHIRN
-            { cat: "Gehirn", q: "Das Gehirn ist ein sehr ___ Organ.", answer: "komplexes" },
-            { cat: "Gehirn", q: "Der größte Teil des Gehirns heißt ___.", answer: "Großhirn" },
-            { cat: "Gehirn", q: "Der Teil unter dem Großhirn heißt ___.", answer: "Zwischenhirn" },
-            { cat: "Gehirn", q: "Der kleine Teil hinten am Gehirn heißt ___.", answer: "Kleinhirn" },
-            { cat: "Gehirn", q: "Der unterste Teil des Gehirns heißt ___.", answer: "Hirnstamm" },
-            { cat: "Gehirn", q: "Die Schlüsselregion für Emotionen ist das ___ System.", answer: "Limbische" },
-            { cat: "Gehirn", q: "Der ___ kontrolliert die Körpertemperatur.", answer: "Hypothalamus" },
+            { cat: "Gehirn", q: "Unser Gehirn ist ein sehr ___ Organ, das alles steuert.", answer: "komplexes" },
+            { cat: "Gehirn", q: "Der größte Bereich im Kopf, der zum Denken dient, heißt ___.", answer: "Großhirn" },
+            { cat: "Gehirn", q: "Zwischen Großhirn und Kleinhirn sitzt das ___.", answer: "Zwischenhirn" },
+            { cat: "Gehirn", q: "Für Gleichgewicht und Bewegung ist das ___ zuständig.", answer: "Kleinhirn" },
+            { cat: "Gehirn", q: "Ganz unten am Gehirn, vor dem Rückenmark, liegt der ___.", answer: "Hirnstamm" },
+            { cat: "Gehirn", q: "Gefühle wie Freude und Angst steuert das ___ System.", answer: "Limbische" },
+            { cat: "Gehirn", q: "Die Körpertemperatur wird vom ___ geregelt.", answer: "Hypothalamus" },
 
             // LUNGE
-            { cat: "Lunge", q: "Die Lunge bringt ___ in unseren Körper.", answer: "Sauerstoff" },
-            { cat: "Lunge", q: "Die Lunge besteht aus zwei ___.", answer: "Lungenflügeln" },
-            { cat: "Lunge", q: "Eine gesunde Lunge hat ungefähr 300 Millionen ___.", answer: "Lungenbläschen" },
-            { cat: "Lunge", q: "Pneumokoniose bedeutet auf Deutsch ___.", answer: "Staublunge" },
-            { cat: "Lunge", q: "Beim Sport hilft uns die ___, weil wir mehr Luft brauchen.", answer: "Mundatmung" },
+            { cat: "Lunge", q: "Zum Atmen brauchen wir ___, den die Lunge liefert.", answer: "Sauerstoff" },
+            { cat: "Lunge", q: "Links und rechts in der Brust sitzen die zwei ___.", answer: "Lungenflügeln" },
+            { cat: "Lunge", q: "In der Lunge gibt es etwa 300 Millionen winzige ___.", answer: "Lungenbläschen" },
+            { cat: "Lunge", q: "Die Krankheit Pneumokoniose heißt auf Deutsch ___.", answer: "Staublunge" },
+            { cat: "Lunge", q: "Wenn wir beim Sport mehr Luft brauchen, nutzen wir die ___.", answer: "Mundatmung" },
 
             // OHR
-            { cat: "Ohr", q: "Das Gleichgewichtsorgan im Ohr heißt ___.", answer: "Vestibularapparat" },
-            { cat: "Ohr", q: "Das spiralförmige Teil im Innenohr heißt ___.", answer: "Schnecke" },
-            { cat: "Ohr", q: "Der mittlere Bereich des Ohrs heißt ___.", answer: "Mittelohr" },
-            { cat: "Ohr", q: "Die ___ gleicht den Druck im Ohr aus.", answer: "Ohrtrompete" },
+            { cat: "Ohr", q: "Unser Gleichgewicht wird vom ___ im Ohr gesteuert.", answer: "Vestibularapparat" },
+            { cat: "Ohr", q: "Im Innenohr sitzt ein spiralförmiges Organ – die ___.", answer: "Schnecke" },
+            { cat: "Ohr", q: "Zwischen Außenohr und Innenohr liegt das ___.", answer: "Mittelohr" },
+            { cat: "Ohr", q: "Den Druckausgleich im Ohr übernimmt die ___.", answer: "Ohrtrompete" },
 
             // ABWEHRSYSTEM
-            { cat: "Abwehrsystem", q: "Weiße Blutzellen heißen mit Fachbegriff ___.", answer: "Leukozyten" },
-            { cat: "Abwehrsystem", q: "Das ___ schützt uns vor Bakterien und Fremdstoffen.", answer: "Abwehrsystem" },
-            { cat: "Abwehrsystem", q: "Wenn Bakterien in den Körper eindringen, nennt man das eine ___.", answer: "Infektion" },
+            { cat: "Abwehrsystem", q: "Der Fachbegriff für weiße Blutkörperchen lautet ___.", answer: "Leukozyten" },
+            { cat: "Abwehrsystem", q: "Unser ___ kämpft gegen Bakterien und schützt den Körper.", answer: "Abwehrsystem" },
+            { cat: "Abwehrsystem", q: "Dringen Bakterien in den Körper ein, spricht man von einer ___.", answer: "Infektion" },
 
             // VERDAUUNG
-            { cat: "Verdauung", q: "Die ___ hält das Verdauungssystem zusammen.", answer: "Gekröse" },
-            { cat: "Verdauung", q: "Im ___ wird die Nahrung hauptsächlich verdaut.", answer: "Dünndarm" },
-            { cat: "Verdauung", q: "Die ___ leitet die Nahrung direkt in den Magen.", answer: "Speiseröhre" },
-            { cat: "Verdauung", q: "Die ___ produziert Galle für die Verdauung.", answer: "Leber" },
-            { cat: "Verdauung", q: "Die ___ speichert die Galle.", answer: "Gallenblase" },
-            { cat: "Verdauung", q: "Die ___ produziert wichtige Verdauungssäfte.", answer: "Bauchspeicheldrüse" },
+            { cat: "Verdauung", q: "Eine Falte des Bauchfells hält alles zusammen – die ___.", answer: "Gekröse" },
+            { cat: "Verdauung", q: "Die meisten Nährstoffe werden im ___ aufgenommen.", answer: "Dünndarm" },
+            { cat: "Verdauung", q: "Vom Mund führt die ___ das Essen hinunter zum Magen.", answer: "Speiseröhre" },
+            { cat: "Verdauung", q: "Galle wird in der ___ hergestellt.", answer: "Leber" },
+            { cat: "Verdauung", q: "Die Galle wird in der ___ gespeichert, bis sie gebraucht wird.", answer: "Gallenblase" },
+            { cat: "Verdauung", q: "Verdauungssäfte kommen aus der ___.", answer: "Bauchspeicheldrüse" },
 
             // HERZ
-            { cat: "Herz", q: "Das Herz ist ungefähr so groß wie eine ___.", answer: "Faust" },
-            { cat: "Herz", q: "Das Herz schlägt schneller bei ___, weil die Muskeln mehr Sauerstoff brauchen.", answer: "Anstrengung" },
+            { cat: "Herz", q: "Dein Herz ist etwa so groß wie deine ___.", answer: "Faust" },
+            { cat: "Herz", q: "Bei körperlicher ___ pumpt das Herz schneller.", answer: "Anstrengung" },
 
             // AUGE
-            { cat: "Auge", q: "Durch die ___ fällt das Licht ins Auge.", answer: "Pupille" },
-            { cat: "Auge", q: "Die ___ nimmt das Licht auf und schickt Signale ans Gehirn.", answer: "Netzhaut" },
-            { cat: "Auge", q: "Der ___ leitet die Signale von der Netzhaut zum Gehirn.", answer: "Sehnerv" },
-            { cat: "Auge", q: "Die ___ bündelt das Licht im Auge.", answer: "Linse" },
-            { cat: "Auge", q: "Die durchsichtige Schicht ganz vorne am Auge heißt ___.", answer: "Hornhaut" },
+            { cat: "Auge", q: "Das Licht gelangt durch die ___ ins Innere des Auges.", answer: "Pupille" },
+            { cat: "Auge", q: "Licht wird von der ___ aufgefangen und in Signale umgewandelt.", answer: "Netzhaut" },
+            { cat: "Auge", q: "Vom Auge zum Gehirn führt der ___.", answer: "Sehnerv" },
+            { cat: "Auge", q: "Im Auge bündelt die ___ das einfallende Licht.", answer: "Linse" },
+            { cat: "Auge", q: "Die klare Schutzschicht ganz vorne am Auge ist die ___.", answer: "Hornhaut" },
         ];
 
         // ===== KARTEIKARTEN LOGIK =====
@@ -920,9 +938,19 @@
             document.getElementById('test-answer').disabled = false;
             document.getElementById('test-answer').focus();
             document.getElementById('letter-practice').classList.remove('active');
+            document.getElementById('test-hint-btn').disabled = false;
             document.getElementById('test-prev-btn').disabled = testIndex === 0;
             document.getElementById('test-next-btn').disabled = testIndex === testQuestions.length - 1;
             updateTestScore();
+        }
+
+        function showHint() {
+            const answer = testQuestions[testIndex].answer;
+            const hint = answer.substring(0, 2) + "...";
+            const input = document.getElementById('test-answer');
+            input.placeholder = hint;
+            input.focus();
+            document.getElementById('test-hint-btn').disabled = true;
         }
 
         function checkTestAnswer() {
