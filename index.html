@@ -445,6 +445,138 @@
             100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
         }
 
+        /* Island Map */
+        .island-section { display: none; width: 100%; max-width: 550px; flex-direction: column; align-items: center; }
+        .island-section.active { display: flex; }
+
+        .island-map {
+            width: 100%;
+            background: linear-gradient(180deg, #74b9ff 0%, #0984e3 100%);
+            border-radius: 16px;
+            padding: 30px 15px;
+            position: relative;
+            min-height: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .island-map::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(0deg, rgba(9,132,227,0.5) 0%, transparent 100%);
+        }
+
+        .island-path {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .island {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            position: relative;
+            transition: all 0.3s;
+            cursor: default;
+            border: 4px solid rgba(255,255,255,0.3);
+        }
+
+        .island.locked {
+            background: #636e72;
+            opacity: 0.6;
+            filter: grayscale(1);
+        }
+
+        .island.unlocked {
+            background: #00b894;
+            border-color: #55efc4;
+            box-shadow: 0 4px 15px rgba(0,184,148,0.4);
+            animation: islandPulse 2s infinite;
+        }
+
+        .island.current {
+            background: #fdcb6e;
+            border-color: #ffeaa7;
+            box-shadow: 0 4px 15px rgba(253,203,110,0.6);
+            transform: scale(1.1);
+        }
+
+        @keyframes islandPulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(0,184,148,0.4); }
+            50% { box-shadow: 0 4px 25px rgba(0,184,148,0.7); }
+        }
+
+        .island-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            margin-top: 2px;
+            max-width: 70px;
+            line-height: 1.1;
+        }
+
+        .island-connector {
+            width: 3px;
+            height: 12px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 2px;
+        }
+
+        .island-treasure {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            border: 4px solid rgba(255,255,255,0.3);
+            transition: all 0.3s;
+        }
+
+        .island-treasure.locked {
+            background: #636e72;
+            opacity: 0.5;
+            filter: grayscale(1);
+        }
+
+        .island-treasure.unlocked {
+            background: linear-gradient(135deg, #fdcb6e, #e17055);
+            border-color: #ffeaa7;
+            box-shadow: 0 6px 20px rgba(253,203,110,0.6);
+            animation: treasurePulse 1.5s infinite;
+        }
+
+        @keyframes treasurePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        .island-info {
+            margin-top: 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .island-info p { margin: 5px 0; color: #636e72; font-size: 0.9rem; }
+        .island-info .progress-count { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
+
         .hidden { display: none !important; }
 
         /* Letter Box Practice */
@@ -530,6 +662,7 @@
     <div class="tab-nav">
         <button class="tab-btn active" onclick="switchTab('flashcards')">📇 Karteikarten</button>
         <button class="tab-btn" onclick="switchTab('test')">✍️ Schriftlicher Test</button>
+        <button class="tab-btn" onclick="switchTab('islands')">🗺️ Inselkarte</button>
     </div>
 
     <!-- FLASHCARD SECTION -->
@@ -632,6 +765,18 @@
             <ul class="scoreboard-list" id="scoreboard-list">
                 <li class="scoreboard-empty">Noch keine Ergebnisse</li>
             </ul>
+        </div>
+    </div>
+
+    <!-- ISLAND MAP SECTION -->
+    <div id="island-section" class="island-section">
+        <div class="island-map">
+            <div class="island-path" id="island-path"></div>
+        </div>
+        <div class="island-info">
+            <p class="progress-count" id="island-progress">0 / 10</p>
+            <p>Themen freigeschaltet</p>
+            <p style="font-size:0.8rem; margin-top:8px;">Schaffe ein Thema im schriftlichen Test ohne Fehler, um die Insel freizuschalten! 🏝️</p>
         </div>
     </div>
 
@@ -1004,6 +1149,12 @@
         function showTestResult() {
             document.getElementById('test-result').classList.remove('hidden');
             const scoreEl = document.getElementById('final-score');
+            const topic = document.getElementById('test-topic-select').value;
+
+            // Unlock island if single topic completed in round 1 with no errors
+            if (topic !== 'alle' && testRound === 1 && testWrong === 0) {
+                unlockIsland(topic);
+            }
 
             if (testRound === 1 && testWrong === 0) {
                 // All correct in one go!
@@ -1256,21 +1407,90 @@
             const tabs = document.querySelectorAll('.tab-btn');
             tabs.forEach(t => t.classList.remove('active'));
 
+            document.getElementById('flashcard-section').classList.remove('active');
+            document.getElementById('flashcard-section').style.display = 'none';
+            document.getElementById('test-section').classList.remove('active');
+            document.getElementById('test-section').style.display = 'none';
+            document.getElementById('island-section').classList.remove('active');
+            document.getElementById('island-section').style.display = 'none';
+
             if (tab === 'flashcards') {
                 tabs[0].classList.add('active');
                 document.getElementById('flashcard-section').classList.add('active');
                 document.getElementById('flashcard-section').style.display = 'flex';
-                document.getElementById('test-section').classList.remove('active');
-                document.getElementById('test-section').style.display = 'none';
-            } else {
+            } else if (tab === 'test') {
                 tabs[1].classList.add('active');
-                document.getElementById('flashcard-section').classList.remove('active');
-                document.getElementById('flashcard-section').style.display = 'none';
                 document.getElementById('test-section').classList.add('active');
                 document.getElementById('test-section').style.display = 'block';
                 shuffleArray(testQuestions);
                 updateTestQuestion();
+            } else if (tab === 'islands') {
+                tabs[2].classList.add('active');
+                document.getElementById('island-section').classList.add('active');
+                document.getElementById('island-section').style.display = 'flex';
+                renderIslandMap();
             }
+        }
+
+        // ===== ISLAND MAP =====
+        const islandTopics = [
+            { id: "Bewegungsapparat", emoji: "🦴", label: "Bewegungs-apparat" },
+            { id: "Nase", emoji: "👃", label: "Die Nase" },
+            { id: "Zunge", emoji: "👅", label: "Die Zunge" },
+            { id: "Gehirn", emoji: "🧠", label: "Das Gehirn" },
+            { id: "Lunge", emoji: "🫁", label: "Die Lunge" },
+            { id: "Ohr", emoji: "👂", label: "Das Ohr" },
+            { id: "Abwehrsystem", emoji: "🛡️", label: "Abwehr-system" },
+            { id: "Verdauung", emoji: "🍏", label: "Verdauung" },
+            { id: "Herz", emoji: "❤️", label: "Das Herz" },
+            { id: "Auge", emoji: "👁️", label: "Das Auge" },
+        ];
+
+        function getUnlockedIslands() {
+            return JSON.parse(localStorage.getItem('bioQuizIslands') || '[]');
+        }
+
+        function unlockIsland(topicId) {
+            let unlocked = getUnlockedIslands();
+            if (!unlocked.includes(topicId)) {
+                unlocked.push(topicId);
+                localStorage.setItem('bioQuizIslands', JSON.stringify(unlocked));
+            }
+        }
+
+        function renderIslandMap() {
+            const unlocked = getUnlockedIslands();
+            const path = document.getElementById('island-path');
+            path.innerHTML = '';
+
+            islandTopics.forEach((topic, i) => {
+                const isUnlocked = unlocked.includes(topic.id);
+                const isNext = !isUnlocked && (i === 0 || unlocked.includes(islandTopics[i-1]?.id));
+
+                const island = document.createElement('div');
+                island.className = 'island ' + (isUnlocked ? 'unlocked' : (isNext ? 'current' : 'locked'));
+                island.innerHTML = topic.emoji + '<span class="island-label">' + topic.label + '</span>';
+                path.appendChild(island);
+
+                if (i < islandTopics.length - 1) {
+                    const connector = document.createElement('div');
+                    connector.className = 'island-connector';
+                    path.appendChild(connector);
+                }
+            });
+
+            // Treasure at the end
+            const allDone = unlocked.length === 10;
+            const treasure = document.createElement('div');
+            treasure.className = 'island-treasure ' + (allDone ? 'unlocked' : 'locked');
+            treasure.innerHTML = allDone ? '🏆' : '🔒';
+
+            const connector = document.createElement('div');
+            connector.className = 'island-connector';
+            path.appendChild(connector);
+            path.appendChild(treasure);
+
+            document.getElementById('island-progress').innerText = unlocked.length + ' / 10';
         }
 
         // App-Start
