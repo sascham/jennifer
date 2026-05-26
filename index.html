@@ -730,6 +730,7 @@
                 <option value="Verdauung">🍏 8. Das Verdauungssystem</option>
                 <option value="Herz">❤️ 9. Das Herz</option>
                 <option value="Auge">👁️ 10. Das Auge</option>
+                <option value="Haut">🧴 11. Die Haut</option>
             </select>
         </div>
 
@@ -771,6 +772,7 @@
                 <option value="Verdauung">🍏 8. Das Verdauungssystem</option>
                 <option value="Herz">❤️ 9. Das Herz</option>
                 <option value="Auge">👁️ 10. Das Auge</option>
+                <option value="Haut">🧴 11. Die Haut</option>
             </select>
         </div>
 
@@ -824,7 +826,7 @@
             <div class="island-path" id="island-path"></div>
         </div>
         <div class="island-info">
-            <p class="progress-count" id="island-progress">0 / 10</p>
+            <p class="progress-count" id="island-progress">0 / 11</p>
             <p>Themen freigeschaltet</p>
             <p style="font-size:0.8rem; margin-top:8px;">Schaffe ein Thema im schriftlichen Test ohne Fehler, um die Insel freizuschalten! 🏝️</p>
         </div>
@@ -996,6 +998,19 @@
             { cat: "Auge", q: "Benenne die Teile des Auges!<br><img src='auge.png'>", a: "1. <b>Hornhaut</b><br>2. <b>Pupille</b><br>3. <b>Iris</b><br>4. <b>Linse</b><br>5. <b>Netzhaut</b><br>6. <b>Sehnerv</b>" },
             { cat: "Auge", q: "Was ist die Aufgabe der Netzhaut im Auge?", a: "Sie fängt das Licht auf und schickt <b>elektrische Signale</b> über den Sehnerv ans Gehirn! ⚡🧠" },
             { cat: "Auge", q: "Stimmt das? Man kann nachts problemlos auf Bildschirme schauen, weil es den Augen egal ist.", a: "<b>Falsch! ❌</b> Bildschirme schaden den Augen – besonders nachts!" },
+
+            // === DIE HAUT ===
+            { cat: "Haut", q: "Was ist das größte Organ unseres Körpers?", a: "Die <b>Haut</b> – sie bedeckt den ganzen Körper! 🧴" },
+            { cat: "Haut", q: "Aus welchen 3 Schichten besteht die Haut? (Von oben nach unten)", a: "1. <b>Oberhaut</b><br>2. <b>Lederhaut</b><br>3. <b>Fettgewebe</b>" },
+            { cat: "Haut", q: "Wovor schützt uns die Haut? Nenne 3 Dinge!", a: "Vor <b>Bakterien</b>, <b>Formaldehyd</b> (Giftstoffe) und <b>hohen Temperaturen</b>" },
+            { cat: "Haut", q: "Wie hilft die Haut, unsere Körpertemperatur zu regeln?", a: "Wenn uns heiß ist, bilden wir <b>Schweiß</b> – der kühlt die Haut ab! 💦" },
+            { cat: "Haut", q: "Was können wir mit der Haut fühlen?", a: "<b>Schmerz</b> und <b>Berührungen</b>" },
+            { cat: "Haut", q: "Stimmt das? Die Haut schützt uns auch vor Kälte.", a: "<b>Richtig! ✅</b> Die Haut (besonders das Fettgewebe) isoliert gegen Kälte." },
+            { cat: "Haut", q: "Stimmt das? Die Haut ist das kleinste Organ im Körper.", a: "<b>Falsch! ❌</b> Die Haut ist das <b>größte</b> Organ!" },
+            { cat: "Haut", q: "Was bildet der Körper, wenn uns zu warm wird?", a: "<b>Schweiß</b> – er verdunstet und kühlt uns ab! 💦" },
+            { cat: "Haut", q: "Welche Schicht der Haut liegt ganz oben?", a: "Die <b>Oberhaut</b>" },
+            { cat: "Haut", q: "Welche Schicht liegt unter der Oberhaut?", a: "Die <b>Lederhaut</b>" },
+            { cat: "Haut", q: "Was liegt ganz unten, unter der Lederhaut?", a: "Das <b>Fettgewebe</b>" },
         ];
 
         // ===== SCHRIFTLICHER TEST – Lückentexte (1 Wort, exakte Schreibweise!) =====
@@ -1065,6 +1080,17 @@
             { cat: "Auge", q: "Vom Auge zum Gehirn führt der ___.", answer: "Sehnerv" },
             { cat: "Auge", q: "Im Auge bündelt die ___ das einfallende Licht.", answer: "Linse" },
             { cat: "Auge", q: "Die klare Schutzschicht ganz vorne am Auge ist die ___.", answer: "Hornhaut" },
+
+            // HAUT
+            { cat: "Haut", q: "Die Haut ist das ___ Organ unseres Körpers.", answer: "größte" },
+            { cat: "Haut", q: "Die Haut schützt uns vor ___, Giftstoffen und Hitze.", answer: "Bakterien" },
+            { cat: "Haut", q: "Wenn uns heiß ist, bildet der Körper ___.", answer: "Schweiß" },
+            { cat: "Haut", q: "Die Haut hilft, unsere ___ zu regeln.", answer: "Körpertemperatur" },
+            { cat: "Haut", q: "Mit der Haut können wir ___ und Berührungen fühlen.", answer: "Schmerz" },
+            { cat: "Haut", q: "Neben Schmerz können wir auch ___ mit der Haut spüren.", answer: "Berührungen" },
+            { cat: "Haut", q: "Die Haut schützt uns auch vor ___.", answer: "Kälte" },
+            { cat: "Haut", q: "Ein Giftstoff, vor dem die Haut schützt, heißt ___.", answer: "Formaldehyd" },
+            { cat: "Haut", q: "Die Haut schützt vor ___ Temperaturen.", answer: "hohen" },
         ];
 
         // ===== KARTEIKARTEN LOGIK =====
@@ -1514,6 +1540,7 @@
             { id: "Verdauung", emoji: "🍏", label: "Verdauung" },
             { id: "Herz", emoji: "❤️", label: "Das Herz" },
             { id: "Auge", emoji: "👁️", label: "Das Auge" },
+            { id: "Haut", emoji: "🧴", label: "Die Haut" },
         ];
 
         function getUnlockedIslands() {
@@ -1550,7 +1577,7 @@
             });
 
             // Treasure at the end
-            const allDone = unlocked.length === 10;
+            const allDone = unlocked.length === 11;
             const treasure = document.createElement('div');
             treasure.className = 'island-treasure ' + (allDone ? 'unlocked' : 'locked');
             treasure.innerHTML = allDone ? '🏆' : '🔒';
@@ -1560,7 +1587,7 @@
             path.appendChild(connector);
             path.appendChild(treasure);
 
-            document.getElementById('island-progress').innerText = unlocked.length + ' / 10';
+            document.getElementById('island-progress').innerText = unlocked.length + ' / 11';
         }
 
         // ===== BADGES =====
@@ -1573,7 +1600,7 @@
             { id: "zauberhaft", emoji: "✨", name: "Zauberhaft", desc: "Alle Fragen beim ersten Versuch richtig" },
             { id: "island-3", emoji: "🏝️", name: "Entdeckerin", desc: "3 Inseln freigeschaltet" },
             { id: "island-5", emoji: "🌊", name: "Seefahrerin", desc: "5 Inseln freigeschaltet" },
-            { id: "island-10", emoji: "🏆", name: "Insel-Meisterin", desc: "Alle 10 Inseln freigeschaltet" },
+            { id: "island-10", emoji: "🏆", name: "Insel-Meisterin", desc: "Alle 11 Inseln freigeschaltet" },
             { id: "speed-demon", emoji: "⚡", name: "Blitzschnell", desc: "Alle Fragen eines Themas in unter 60 Sek." },
             { id: "persistent", emoji: "💪", name: "Durchhalterin", desc: "5 Tests insgesamt abgeschlossen" },
             { id: "perfectionist", emoji: "💎", name: "Perfektionistin", desc: "3 Themen ohne Fehler geschafft" },
@@ -1602,7 +1629,7 @@
             // Island milestones
             if (unlocked.length >= 3) earnBadge('island-3');
             if (unlocked.length >= 5) earnBadge('island-5');
-            if (unlocked.length >= 10) earnBadge('island-10');
+            if (unlocked.length >= 11) earnBadge('island-10');
 
             // Persistent (5 tests done)
             if (history.length >= 5) earnBadge('persistent');
